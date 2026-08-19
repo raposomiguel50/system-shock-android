@@ -7,12 +7,13 @@ This public snapshot is intended to make the engineering work inspectable and re
 ## Status
 
 - Development state: **pre-release / active development**
+- Latest public source preview: **[v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)**
 - Validated reference device: **Retroid Pocket 5**
 - Current validated implementation baseline: **P2.0B + P2.0A Hor+**
 - Architecture: **Android / ARM64 (`arm64-v8a`)**
 - Upstream Shockolate baseline: [`4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690`](https://github.com/Interrupt/systemshock/commit/4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690)
 - SDL baseline: **2.32.10**, commit [`5d249570393f7a37e037abf22cd6012a4cc56a71`](https://github.com/libsdl-org/SDL/commit/5d249570393f7a37e037abf22cd6012a4cc56a71)
-- SDL_mixer: **2.8.1**
+- SDL_mixer: **2.8.1**, commit [`171eb2d420d5643e4ee11514a06e04a41a463bbd`](https://github.com/libsdl-org/SDL_mixer/commit/171eb2d420d5643e4ee11514a06e04a41a463bbd)
 - Proprietary game data included: **No**
 
 ## What is implemented
@@ -37,6 +38,21 @@ This public snapshot is intended to make the engineering work inspectable and re
 6. For the current developer/debug workflow, use `scripts/install-debug.ps1` to install the APK and copy your own data into app-private storage.
 
 The current data-import workflow deliberately uses a **debug build + ADB**. A user-friendly release importer is still an open item; see [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md).
+
+## Feedback, testing and contributions
+
+Feedback is part of the project. Use the structured GitHub forms so reports remain searchable and useful to other testers:
+
+- [Report a bug](https://github.com/raposomiguel50/system-shock-android/issues/new?template=bug_report.yml)
+- [Suggest a feature or improvement](https://github.com/raposomiguel50/system-shock-android/issues/new?template=feature_request.yml)
+- [Submit an Android compatibility report](https://github.com/raposomiguel50/system-shock-android/issues/new?template=compatibility_report.yml)
+- [Report a documentation correction](https://github.com/raposomiguel50/system-shock-android/issues/new?template=documentation.yml)
+- [Leave general feedback or ask a question](https://github.com/raposomiguel50/system-shock-android/issues/new?template=general_feedback.yml)
+- [Open a pull request](https://github.com/raposomiguel50/system-shock-android/pulls)
+
+For professional contact, use [LinkedIn](https://www.linkedin.com/in/miguel-raposo-7192a251/). Please do not attach proprietary System Shock game data, private information or credentials to public issues.
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution and evidence guidelines.
 
 ## Knowledge base
 
