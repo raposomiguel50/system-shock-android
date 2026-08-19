@@ -1,0 +1,33 @@
+name: General feedback or question
+description: Share general feedback, ask a project question or start a technical conversation.
+title: "[Feedback] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for feedback or questions that do not fit the bug, suggestion, compatibility or documentation forms.
+
+  - type: textarea
+    id: message
+    attributes:
+      label: Feedback or question
+      description: Keep observations, questions and suggestions as specific as practical.
+    validations:
+      required: true
+
+  - type: input
+    id: context
+    attributes:
+      label: Relevant version, page or device
+      description: Optional context that helps place the feedback.
+      placeholder: v0.1.0-pre.2 / Retroid Pocket 5 / project website
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Public discussion
+      options:
+        - label: I understand this GitHub issue will be public.
+          required: true
+        - label: I have not included proprietary System Shock game data or private information.
+          required: true
