@@ -1,0 +1,107 @@
+/*
+
+Copyright (C) 1994-1995 Looking Glass Technologies, Inc.
+Copyright (C) 2015-2018 Night Dive Studios, LLC.
+Copyright (C) 2018-2020 Shockolate Project
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+// ShockBitmap.c - Manages off-screen bitmaps and palettes.
+
+//--------------------
+//  Includes
+//--------------------
+#include "InitMac.h"
+#include "Shock.h"
+#include "ShockBitmap.h"
+#include "2d.h"
+
+//--------------------
+//  Globals
+//--------------------
+SDL_Surface *drawSurface;
+SDL_Surface *offscreenDrawSurface;
+
+void ChangeScreenSize(int width, int height) {
+    if (gScreenWide == width && gScreenHigh == height)
+        return;
+
+    INFO("ChangeScreenSize");
+
+    SDL_RenderClear(renderer);
+
+#ifdef __ANDROID__
+    /* Android owns the native Surface size. Resizing the SDL window to the
+       4:3 logical render size shrinks the Android Surface itself; the Surface
+       is restored to the physical display only after an Activity resume.
+       Keep the native Surface untouched and change only SDL's logical view. */
+    SDL_RenderSetViewport(renderer, NULL);
+    if (SDL_RenderSetLogicalSize(renderer, width, height) < 0) {
+        SDL_Log("RP5NP_ANDROID_SCREENMODE_FAIL logical=%dx%d error=%s", width, height, SDL_GetError());
+    } else {
+        int window_w = 0, window_h = 0;
+        int output_w = 0, output_h = 0;
+        SDL_GetWindowSize(window, &window_w, &window_h);
+        SDL_GetRendererOutputSize(renderer, &output_w, &output_h);
+        SDL_Log("RP5NP_ANDROID_SCREENMODE_OK logical=%dx%d window=%dx%d output=%dx%d",
+                width, height, window_w, window_h, output_w, output_h);
+    }
+#else
+    extern bool fullscreenActive;
+    SDL_SetWindowFullscreen(window, fullscreenActive ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+
+    SDL_SetWindowSize(window, width, height);
+    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    SDL_RenderSetLogicalSize(renderer, width, height);
+#endif
+
+    SetupOffscreenBitmaps(width, height);
+
+    gScreenWide = width;
+    gScreenHigh = height;
+}
+
+//------------------------------------------------------------------------------------
+//		Setup the main offscreen bitmaps.
+//------------------------------------------------------------------------------------
+void SetupOffscreenBitmaps(int width, int height) {
+    DEBUG("SetupOffscreenBitmaps %i %i", width, height);
+
+    if (drawSurface != NULL) {
+        SDL_FreeSurface(drawSurface);
+    }
+    if (offscreenDrawSurface != NULL) {
+        SDL_FreeSurface(offscreenDrawSurface);
+    }
+
+    drawSurface = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
+    if (!drawSurface) {
+        ERROR("SDL: Failed to create draw surface");
+        return;
+    }
+
+    offscreenDrawSurface = SDL_CreateRGBSurface(0, width, height, 8, 0, 0, 0, 0);
+    if (!offscreenDrawSurface) {
+        ERROR("SDL: Failed to create offscreen draw surface");
+        return;
+    }
+
+    // Point the renderer at the screen bytes
+    gScreenRowbytes = drawSurface->w;
+    gScreenAddress = drawSurface->pixels;
+
+    grd_mode_cap.vbase = gScreenAddress;
+}

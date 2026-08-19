@@ -1,0 +1,46 @@
+apply plugin: 'com.android.application'
+
+android {
+    namespace "com.rp5np.systemshock"
+    compileSdkVersion 34
+    buildToolsVersion "34.0.0"
+    ndkVersion "29.0.14206865"
+
+    defaultConfig {
+        applicationId "com.rp5np.systemshock"
+        minSdkVersion 33
+        targetSdkVersion 33
+        versionCode 12
+        versionName "0.7.8-rp5-p1.7-audio4"
+
+        externalNativeBuild {
+            cmake {
+                abiFilters 'arm64-v8a'
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path 'jni/CMakeLists.txt'
+            version "3.22.1"
+        }
+    }
+
+    lint {
+        abortOnError false
+    }
+}
+
+dependencies {
+}

@@ -1,0 +1,61 @@
+/RES/
+build
+CMakeLists.txt.user
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# CMake
+CMakeFiles
+src/Libraries/CMakeFiles
+
+**/CMakeCache.txt
+**/cmake_install.cmake
+**/Makefile
+
+TestSimpleMain
+**/core
+
+# 3rd Party builds
+build_ext
+
+# Save files
+CurrentGame.dat
+savgam*.dat
+
+# Temporary audio files
+.temp.audio
+
+# Eclipse CDT
+.project
+.cproject
+.DS_Store

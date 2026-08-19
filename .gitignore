@@ -1,0 +1,20 @@
+# Build/dependency output
+.deps/
+AndroidProject/.gradle/
+AndroidProject/local.properties
+AndroidProject/app/.cxx/
+AndroidProject/app/build/
+*.apk
+*.aab
+
+# Proprietary System Shock data must never be committed
+res/
+game-data/
+private-data/
+*.res
+
+# Local editor/OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
