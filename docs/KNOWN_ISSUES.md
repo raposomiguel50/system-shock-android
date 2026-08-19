@@ -4,12 +4,13 @@ This file deliberately separates unresolved work from already-proven behavior.
 
 ## REL-SS-001 - v0.1.0-pre.1 SDL_mixer bootstrap failure
 
-**Status:** Fixed on `main`; `v0.1.0-pre.1` remains affected  
+**Status:** Fixed on `main`; targeted fix validation passed; `v0.1.0-pre.1` remains affected  
 **Observed during:** First clean-clone reproduction test on Windows 11 / PowerShell 7.6.4.  
 **Symptom:** `scripts/bootstrap-deps.ps1` cloned SDL_mixer but failed at `git checkout --detach release-2.8.1`.  
 **Root cause:** The helper cloned SDL_mixer with `--no-tags`, then attempted to check out the tag without explicitly fetching it.  
 **Resolution on main:** If a requested ref is not locally resolvable, the helper explicitly fetches the matching tag before checkout. SDL_mixer `release-2.8.1` is also pinned to commit `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
-**Release consequence:** Do not treat `v0.1.0-pre.1` as a passing fresh-clone reproduction release. A corrected pre-release must pass the clean-clone gate before superseding it.
+**Targeted validation:** Re-running the corrected helper against the already-downloaded clean-clone dependency directories succeeded with SDL at `5d249570393f7a37e037abf22cd6012a4cc56a71`, SDL_mixer at `171eb2d420d5643e4ee11514a06e04a41a463bbd`, `BOOTSTRAP_DEPS=PASS`, and `BOOTSTRAP_FIX_TARGETED=PASS`.  
+**Release consequence:** Do not treat `v0.1.0-pre.1` as a passing fresh-clone reproduction release. A corrected pre-release must repeat the clean-clone gate from a new path before superseding it.
 
 ## OPEN-SS-001 - End-user game-data importer
 
@@ -46,5 +47,5 @@ This file deliberately separates unresolved work from already-proven behavior.
 ## OPEN-SS-006 - Independent fresh-clone proof
 
 **Status:** Open  
-**Evidence:** Source checkout passed. The first dependency-bootstrap attempt exposed REL-SS-001 before the build gate was reached.  
-**Required resolution:** A corrected public pre-release must pass dependency bootstrap, APK build, semantic APK verification, device installation, separately owned game-data import and RP5 runtime QA from a clean path.
+**Evidence:** Source checkout passed. The first dependency-bootstrap attempt exposed REL-SS-001. The targeted correction then passed against the same clean-clone dependency directories.  
+**Required resolution:** A corrected public pre-release must repeat source checkout and dependency bootstrap from a new clean path, then pass APK build, semantic APK verification, device installation, separately owned game-data import and RP5 runtime QA.
