@@ -1,0 +1,33 @@
+name: Documentation correction
+description: Report unclear, outdated or incorrect documentation.
+title: "[Docs] "
+body:
+  - type: input
+    id: location
+    attributes:
+      label: Page or file
+      description: Link to the page, file or section that needs correction.
+      placeholder: docs/BUILD.md or project website URL
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is unclear or incorrect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: correction
+    attributes:
+      label: Suggested correction
+      description: Provide corrected wording or the information that should replace it.
+    validations:
+      required: true
+
+  - type: textarea
+    id: source
+    attributes:
+      label: Supporting source or evidence
+      description: Add a primary source, command output or other evidence when applicable.
