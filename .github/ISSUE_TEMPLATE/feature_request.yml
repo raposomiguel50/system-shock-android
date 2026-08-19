@@ -1,0 +1,61 @@
+name: Feature or improvement suggestion
+description: Suggest a change that could improve the port, build process or documentation.
+title: "[Suggestion] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggestions are welcome. Explain the problem or opportunity first, then the proposed change.
+
+  - type: textarea
+    id: need
+    attributes:
+      label: Problem or opportunity
+      description: What would this improve, simplify or make possible?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed change
+      description: Describe the idea as concretely as possible.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Controls / input
+        - Display / widescreen
+        - Audio
+        - Android lifecycle / platform
+        - Build / reproducibility
+        - Game-data import
+        - Graphics / fonts
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: tradeoffs
+    attributes:
+      label: Tradeoffs or compatibility concerns
+      description: Note any risks to 4:3 fallback, legacy behavior, other Android devices or reproducibility.
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References or examples
+      description: Optional links, prior art or technical references.
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Project boundaries
+      options:
+        - label: This suggestion does not require redistributing proprietary System Shock game data.
+          required: true
