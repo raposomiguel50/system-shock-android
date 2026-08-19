@@ -15,8 +15,12 @@ if (-not $AndroidSdk) {
 if (-not $JavaHome) { throw 'JDK 17 required. Set JAVA_HOME or pass -JavaHome.' }
 $Java = Join-Path $JavaHome 'bin\java.exe'
 if (-not (Test-Path -LiteralPath $Java -PathType Leaf)) { throw "java.exe not found: $Java" }
-$JavaVersion = & $Java -version 2>&1 | Select-Object -First 1
-if ($JavaVersion -notmatch '17[\._]') { Write-Warning "Expected JDK 17; detected: $JavaVersion" }
+$JavaVersion = (& $Java -version 2>&1 | Select-Object -First 1).ToString()
+if ($JavaVersion -notmatch 'version\s+"(?<major>\d+)') { throw "Unable to determine Java major version from: $JavaVersion" }
+$JavaMajor = [int]$Matches.major
+if ($JavaMajor -ne 17) { throw "JDK 17 required for this Gradle 8.1.1 build. Detected Java $JavaMajor at '$JavaHome'. Pass -JavaHome with a JDK 17 installation." }
+Write-Host "JAVA_MAJOR=$JavaMajor"
+Write-Host "JAVA_HOME=$JavaHome"
 if (-not (Test-Path -LiteralPath $AndroidSdk -PathType Container)) { throw "Android SDK not found: $AndroidSdk" }
 $Required = @(
     (Join-Path $AndroidSdk 'platforms\android-34'),
