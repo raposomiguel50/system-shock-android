@@ -13,6 +13,15 @@ This file deliberately separates unresolved work from already-proven behavior.
 **Clean pre.2 validation:** A completely new `v0.1.0-pre.2` clone was created at `C:\MGDL-FreshClone-Tests\system-shock-android-v0.1.0-pre.2_20260820_004357`. No `.deps` directory existed before execution. The helper downloaded both dependencies from scratch and completed with `FRESH_PRE2_BOOTSTRAP=PASS`; SDL resolved to `5d249570393f7a37e037abf22cd6012a4cc56a71` and SDL_mixer to `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
 **Release consequence:** `v0.1.0-pre.1` is retained as affected historical evidence. `v0.1.0-pre.2` supersedes it for public reproduction work.
 
+## REL-SS-002 - Build attempted with unsupported JDK 25
+
+**Status:** Environment mismatch identified; build gate hardened on `main`  
+**Observed during:** First APK build attempt from the clean `v0.1.0-pre.2` reproduction path on Windows 11 / PowerShell 7.6.4.  
+**Symptom:** The build helper warned that JDK 17 was expected but continued with OpenJDK 25. Gradle 8.1.1 then failed during build-script semantic analysis with `Unsupported class file major version 69`.  
+**Root cause:** The reproduction host exposed JDK 25 through `JAVA_HOME`, while this public build baseline requires JDK 17. The helper treated the mismatch as a warning instead of a hard precondition.  
+**Resolution on main:** `scripts/build.ps1` now parses the Java major version and fails immediately unless it is exactly 17, with an explicit instruction to pass `-JavaHome` to a JDK 17 installation.  
+**Validation required:** Re-run the exact `v0.1.0-pre.2` build using JDK 17. The release tag remains unchanged because its documented requirement already specifies JDK 17; the stronger fail-fast behavior is a usability improvement on `main`.
+
 ## OPEN-SS-001 - End-user game-data importer
 
 **Status:** Open  
@@ -49,4 +58,5 @@ This file deliberately separates unresolved work from already-proven behavior.
 
 **Status:** Open, partially passed  
 **Passed evidence:** Exact `v0.1.0-pre.2` source checkout from a new path and from-scratch public dependency bootstrap both passed.  
-**Still required:** APK build, semantic APK verification, device installation, separately owned game-data import and RP5 runtime QA from the clean reproduction path.
+**Current blocker:** The first APK build attempt used JDK 25 instead of the required JDK 17 and therefore did not reach a valid build test.  
+**Still required:** APK build under JDK 17, semantic APK verification, device installation, separately owned game-data import and RP5 runtime QA from the clean reproduction path.
