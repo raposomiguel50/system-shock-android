@@ -81,13 +81,13 @@ This knowledge base is structured like an operational engineering record: **cont
 
 ## KB-SS-011 - A no-tags clone cannot assume a release tag is locally available
 
-**Status:** Resolved on `main`; discovered by fresh-clone testing  
+**Status:** Resolved and clean-clone validated in `v0.1.0-pre.2`  
 **Context:** First independent clean-clone dependency bootstrap for public pre-release `v0.1.0-pre.1`.  
 **Symptom:** SDL cloned and pinned correctly, but SDL_mixer failed at `git checkout --detach release-2.8.1`.  
 **Impact:** The source checkout gate passed, but the dependency-bootstrap gate failed and the release could not yet be called independently reproducible.  
 **Root cause:** The helper used `git clone --no-tags` and later tried to check out `release-2.8.1` without explicitly fetching that tag. The ref therefore did not exist locally.  
 **Resolution:** Keep `--no-tags` for controlled cloning, but test whether the requested ref resolves locally and explicitly fetch `refs/tags/<tag>` when required. Pin SDL_mixer `release-2.8.1` to commit `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
-**Validation:** Pending targeted rerun and then a new clean-clone pre-release gate.  
+**Validation:** A targeted rerun passed first. A completely new `v0.1.0-pre.2` clone was then created in a new path with no pre-existing `.deps` directory. The helper downloaded both dependencies from scratch and completed with `FRESH_PRE2_BOOTSTRAP=PASS`, SDL at `5d249570393f7a37e037abf22cd6012a4cc56a71` and SDL_mixer at `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
 **Reusable lesson:** Dependency pinning must verify object availability, not merely name a tag. A clean clone is the test that exposes hidden dependence on local Git metadata.
 
 ## Template for future entries
