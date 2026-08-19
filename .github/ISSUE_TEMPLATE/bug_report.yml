@@ -1,0 +1,89 @@
+name: Bug report
+description: Report a reproducible build, installation or runtime problem.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for testing System Shock Android. Please provide observed evidence and keep hypotheses separate from confirmed causes.
+
+  - type: dropdown
+    id: version
+    attributes:
+      label: Version or source
+      description: Which public version did you test?
+      options:
+        - v0.1.0-pre.2
+        - main
+        - Other / not sure
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Android device or handheld model.
+      placeholder: Retroid Pocket 5
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Android version
+      placeholder: Android 13
+    validations:
+      required: true
+
+  - type: input
+    id: host
+    attributes:
+      label: Build host, if relevant
+      description: OS and shell used to build or install the port.
+      placeholder: Windows 11 / PowerShell 7.6.4
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: List the shortest reliable sequence that triggers the problem.
+      placeholder: |
+        1. Clone ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed result
+      description: What actually happened? Include exact errors where possible.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or evidence
+      description: Paste relevant non-sensitive logs, hashes or screenshots. Do not attach proprietary System Shock game data.
+      render: shell
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: I have not attached proprietary System Shock game data.
+          required: true
