@@ -1,6 +1,6 @@
 # Open knowledge base
 
-This knowledge base is structured like an operational engineering record: **context → symptom → impact → root cause → resolution/decision → validation → reusable lesson**. Open concerns are kept visible instead of being rewritten out of the project history.
+This knowledge base is structured like an operational engineering record: **context -> symptom -> impact -> root cause -> resolution/decision -> validation -> reusable lesson**. Open concerns are kept visible instead of being rewritten out of the project history.
 
 ## KB-SS-001 - PowerShell variable case collision
 
@@ -10,7 +10,7 @@ This knowledge base is structured like an operational engineering record: **cont
 **Root cause:** PowerShell variable names are case-insensitive; `$Activity` and `$activity` were treated as the same variable.  
 **Resolution:** Eliminate case-only variable distinctions and add automatic-variable/casing collision validation to critical runners.  
 **Validation:** Subsequent automation separated build/runtime defects from launcher defects and no longer relied on case-only names.  
-**Reusable lesson:** On PowerShell, casing is presentation-not identity.
+**Reusable lesson:** On PowerShell, casing is presentation, not identity.
 
 ## KB-SS-002 - Android surface/lifecycle mistaken for renderer failure
 
@@ -56,7 +56,7 @@ This knowledge base is structured like an operational engineering record: **cont
 
 **Status:** Validated prototype / current baseline  
 **Problem:** Filling a 16:9 display must not distort the original 4:3 scene/UI.  
-**Resolution:** 1366×768 Hor+ expands horizontal world coverage while keeping a centered 1024×768 legacy UI safe area. 4:3 remains a reversible fallback.  
+**Resolution:** 1366x768 Hor+ expands horizontal world coverage while keeping a centered 1024x768 legacy UI safe area. 4:3 remains a reversible fallback.  
 **Reusable lesson:** Preserve a reversible reference presentation before widening scene geometry.
 
 ## KB-SS-008 - HD assets versus an indexed 8-bit renderer
@@ -78,6 +78,17 @@ This knowledge base is structured like an operational engineering record: **cont
 **Status:** Standard  
 **Rule:** A build is not considered successful solely because a process returns zero. The expected APK must exist, expected ARM64 libraries must be present, proprietary assets must be absent, and target behavior must be separated into machine and manual QA gates.  
 **Reusable lesson:** Evidence should prove the artifact and behavior you actually care about.
+
+## KB-SS-011 - A no-tags clone cannot assume a release tag is locally available
+
+**Status:** Resolved on `main`; discovered by fresh-clone testing  
+**Context:** First independent clean-clone dependency bootstrap for public pre-release `v0.1.0-pre.1`.  
+**Symptom:** SDL cloned and pinned correctly, but SDL_mixer failed at `git checkout --detach release-2.8.1`.  
+**Impact:** The source checkout gate passed, but the dependency-bootstrap gate failed and the release could not yet be called independently reproducible.  
+**Root cause:** The helper used `git clone --no-tags` and later tried to check out `release-2.8.1` without explicitly fetching that tag. The ref therefore did not exist locally.  
+**Resolution:** Keep `--no-tags` for controlled cloning, but test whether the requested ref resolves locally and explicitly fetch `refs/tags/<tag>` when required. Pin SDL_mixer `release-2.8.1` to commit `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
+**Validation:** Pending targeted rerun and then a new clean-clone pre-release gate.  
+**Reusable lesson:** Dependency pinning must verify object availability, not merely name a tag. A clean clone is the test that exposes hidden dependence on local Git metadata.
 
 ## Template for future entries
 
