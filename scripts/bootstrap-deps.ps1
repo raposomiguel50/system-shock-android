@@ -13,6 +13,11 @@ function Ensure-Repo([string]$Name,[string]$Url,[string]$Ref,[string]$ExpectedCo
     }
     & $Git -C $Path fetch --prune origin
     if ($LASTEXITCODE -ne 0) { throw "git fetch failed: $Name" }
+    & $Git -C $Path rev-parse --verify --quiet "$Ref^{commit}" *> $null
+    if ($LASTEXITCODE -ne 0) {
+        & $Git -C $Path fetch --force origin "refs/tags/${Ref}:refs/tags/${Ref}"
+        if ($LASTEXITCODE -ne 0) { throw "git tag fetch failed: $Name ref=$Ref" }
+    }
     & $Git -C $Path checkout --detach $Ref
     if ($LASTEXITCODE -ne 0) { throw "git checkout failed: $Name ref=$Ref" }
     $Actual = (& $Git -C $Path rev-parse HEAD).Trim()
@@ -20,5 +25,5 @@ function Ensure-Repo([string]$Name,[string]$Url,[string]$Ref,[string]$ExpectedCo
     Write-Host "$Name=$Actual"
 }
 Ensure-Repo 'SDL2' 'https://github.com/libsdl-org/SDL.git' '5d249570393f7a37e037abf22cd6012a4cc56a71' '5d249570393f7a37e037abf22cd6012a4cc56a71'
-Ensure-Repo 'SDL2_mixer' 'https://github.com/libsdl-org/SDL_mixer.git' 'release-2.8.1'
+Ensure-Repo 'SDL2_mixer' 'https://github.com/libsdl-org/SDL_mixer.git' 'release-2.8.1' '171eb2d420d5643e4ee11514a06e04a41a463bbd'
 Write-Host 'BOOTSTRAP_DEPS=PASS'
