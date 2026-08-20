@@ -20,7 +20,6 @@
         <activity
             android:name="com.rp5np.systemshock.ShockolateActivity"
             android:label="System Shock RP5 P1.7"
-        android:icon="@mipmap/ic_launcher"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:screenOrientation="landscape"
