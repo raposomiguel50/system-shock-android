@@ -8,7 +8,9 @@ AndroidProject/app/build/
 *.aab
 
 # Proprietary System Shock data must never be committed
-res/
+# Only the repository-root /res/ directory is proprietary game data.
+# AndroidProject/app/src/main/res/ contains normal Android resources and must be tracked.
+/res/
 game-data/
 private-data/
 *.res
