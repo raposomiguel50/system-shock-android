@@ -1,5 +1,16 @@
 apply plugin: 'com.android.application'
 
+def releaseStoreFilePath = System.getenv('RP5NP_RELEASE_STORE_FILE')
+def releaseStorePasswordValue = System.getenv('RP5NP_RELEASE_STORE_PASSWORD')
+def releaseKeyAliasValue = System.getenv('RP5NP_RELEASE_KEY_ALIAS')
+def releaseKeyPasswordValue = System.getenv('RP5NP_RELEASE_KEY_PASSWORD')
+def releaseSigningConfigured = [
+    releaseStoreFilePath,
+    releaseStorePasswordValue,
+    releaseKeyAliasValue,
+    releaseKeyPasswordValue
+].every { value -> value != null && !value.trim().isEmpty() }
+
 android {
     namespace "com.rp5np.systemshock"
     compileSdkVersion 34
@@ -10,12 +21,23 @@ android {
         applicationId "com.rp5np.systemshock"
         minSdkVersion 33
         targetSdkVersion 33
-        versionCode 12
-        versionName "0.7.8-rp5-p1.7-audio4"
+        versionCode 13
+        versionName "0.1.0-pre.3"
 
         externalNativeBuild {
             cmake {
                 abiFilters 'arm64-v8a'
+            }
+        }
+    }
+
+    signingConfigs {
+        if (releaseSigningConfigured) {
+            release {
+                storeFile file(releaseStoreFilePath)
+                storePassword releaseStorePasswordValue
+                keyAlias releaseKeyAliasValue
+                keyPassword releaseKeyPasswordValue
             }
         }
     }
@@ -25,8 +47,22 @@ android {
             debuggable true
             minifyEnabled false
         }
-        release {
+
+        qa {
+            initWith debug
+            applicationIdSuffix ".qa"
+            versionNameSuffix "-qa"
+            debuggable true
             minifyEnabled false
+            signingConfig signingConfigs.debug
+        }
+
+        release {
+            debuggable false
+            minifyEnabled false
+            if (releaseSigningConfigured) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
