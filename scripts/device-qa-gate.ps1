@@ -2,7 +2,8 @@
 param(
     [string]$Apk = '',
     [string]$AndroidSdk = '',
-    [int]$SmokeSeconds = 10
+    [int]$SmokeSeconds = 10,
+    [string]$LogcatOut = ''
 )
 
 Set-StrictMode -Version Latest
@@ -35,6 +36,13 @@ if (-not $Apk) {
 }
 if (-not (Test-Path -LiteralPath $Apk -PathType Leaf)) {
     throw "QA APK not found: $Apk"
+}
+
+if ($LogcatOut) {
+    $LogcatDirectory = Split-Path -Parent $LogcatOut
+    if ($LogcatDirectory) {
+        New-Item -ItemType Directory -Force -Path $LogcatDirectory | Out-Null
+    }
 }
 
 function Get-PackageSnapshot {
@@ -92,6 +100,9 @@ if ($QaPid -notmatch '^\d+(\s+\d+)*$') {
 }
 
 $LogcatLines = @(& $Adb logcat -d -t 1500 | ForEach-Object { $_.ToString() })
+if ($LogcatOut) {
+    $LogcatLines | Set-Content -LiteralPath $LogcatOut -Encoding utf8
+}
 $FatalLines = @($LogcatLines | Where-Object {
     $_ -match 'com\.rp5np\.systemshock\.qa' -and
     $_ -match '(FATAL EXCEPTION|Fatal signal|SIGSEGV|SIGABRT)'
@@ -112,4 +123,7 @@ Write-Host "ADB_DEVICE=$($ReadyDevices[0].Trim())"
 Write-Host "QA_PACKAGE=$QaPackage"
 Write-Host "QA_PID=$QaPid"
 Write-Host "SMOKE_SECONDS=$SmokeSeconds"
+if ($LogcatOut) {
+    Write-Host "LOGCAT=$LogcatOut"
+}
 Write-Host 'BASELINE_PRESERVED=PASS'
