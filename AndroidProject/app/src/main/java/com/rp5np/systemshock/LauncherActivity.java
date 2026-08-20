@@ -178,6 +178,7 @@ public final class LauncherActivity extends Activity {
 
         CopyStats stats = new CopyStats();
         boolean destinationBackedUp = false;
+        boolean importActivated = false;
 
         try {
             copyDirectory(resolver, treeUri, dataNode.documentId,
@@ -203,18 +204,27 @@ public final class LauncherActivity extends Activity {
                 }
                 throw new IOException("Unable to activate the imported game data.");
             }
+            importActivated = true;
 
             if (destinationBackedUp) {
-                deleteRecursively(backup);
+                tryDeleteRecursively(backup);
             }
 
             return stats;
-        } catch (IOException error) {
-            deleteRecursively(staging);
-            if (destinationBackedUp && !destination.exists() && backup.exists()) {
-                backup.renameTo(destination);
+        } catch (Exception error) {
+            if (!importActivated) {
+                tryDeleteRecursively(staging);
+                if (destinationBackedUp && !destination.exists() && backup.exists()) {
+                    if (!backup.renameTo(destination)) {
+                        Log.e(TAG, "GAME_DATA_IMPORT_RESTORE=FAIL");
+                    }
+                }
             }
-            throw error;
+
+            if (error instanceof IOException) {
+                throw (IOException) error;
+            }
+            throw new IOException("Unable to import the selected folder.", error);
         }
     }
 
@@ -360,6 +370,14 @@ public final class LauncherActivity extends Activity {
 
         if (!file.delete() && file.exists()) {
             throw new IOException("Unable to remove a temporary import item.");
+        }
+    }
+
+    private static void tryDeleteRecursively(File file) {
+        try {
+            deleteRecursively(file);
+        } catch (IOException error) {
+            Log.w(TAG, "GAME_DATA_IMPORT_CLEANUP=FAIL", error);
         }
     }
 
