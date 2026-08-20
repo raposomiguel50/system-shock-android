@@ -41,7 +41,15 @@ if ($DeviceState -ne 'device') {
 
 function Get-PackagePath {
     param([Parameter(Mandatory=$true)][string]$PackageName)
-    return @(& $Adb shell pm path $PackageName 2>$null | ForEach-Object { $_.ToString().Trim() })
+    return @(& $Adb shell pm path $PackageName 2>$null | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ })
+}
+
+function Assert-RunAs {
+    param([Parameter(Mandatory=$true)][string]$PackageName)
+    $Output = (& $Adb shell run-as $PackageName id 2>&1 | Out-String).Trim()
+    if ($LASTEXITCODE -ne 0 -or $Output -notmatch 'uid=') {
+        throw "run-as unavailable for package $PackageName. Output: $Output"
+    }
 }
 
 function Test-PrivateDirectory {
@@ -58,23 +66,31 @@ function Get-PrivateFileCount {
         [Parameter(Mandatory=$true)][string]$PackageName,
         [Parameter(Mandatory=$true)][string]$Directory
     )
-    $Command = "find $Directory -type f | wc -l"
-    $Output = (& $Adb shell run-as $PackageName sh -c $Command 2>&1 | Out-String).Trim()
-    if ($LASTEXITCODE -ne 0 -or $Output -notmatch '^\d+$') {
-        throw "Unable to count files for $PackageName/$Directory. Output: $Output"
+    $RemoteCommand = "run-as $PackageName find $Directory -type f"
+    $Lines = @(& $Adb shell $RemoteCommand 2>&1 | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ })
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to enumerate files for $PackageName/$Directory. Output: $($Lines -join '; ')"
     }
-    return [int]$Output
+    return $Lines.Count
 }
 
 $BaselinePathBefore = @(Get-PackagePath -PackageName $BaselinePackage)
 if ($BaselinePathBefore.Count -lt 1) {
     throw "Baseline package is not installed: $BaselinePackage"
 }
+
+Assert-RunAs -PackageName $BaselinePackage
+
 if (-not (Test-PrivateDirectory -PackageName $BaselinePackage -Directory 'files/res/data')) {
     throw 'Baseline app-private files/res/data is unavailable through run-as.'
 }
 if (-not (Test-PrivateDirectory -PackageName $BaselinePackage -Directory 'files/res/sound')) {
     throw 'Baseline app-private files/res/sound is unavailable through run-as.'
+}
+
+$TarHelp = (& $Adb shell toybox tar --help 2>&1 | Out-String)
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($TarHelp)) {
+    throw 'Android toybox tar is unavailable; refusing an unverified data-copy path.'
 }
 
 $BaselineDataCount = Get-PrivateFileCount -PackageName $BaselinePackage -Directory 'files/res/data'
@@ -88,6 +104,8 @@ if ($LASTEXITCODE -ne 0) {
     throw "QA APK install failed: $LASTEXITCODE"
 }
 
+Assert-RunAs -PackageName $QaPackage
+
 & $Adb shell am force-stop $QaPackage | Out-Null
 & $Adb shell run-as $QaPackage rm -rf files/res
 if ($LASTEXITCODE -ne 0) {
@@ -98,10 +116,10 @@ if ($LASTEXITCODE -ne 0) {
     throw 'Unable to prepare QA app-private files directory.'
 }
 
-$CopyCommand = "run-as $BaselinePackage tar -C files -cf - res | run-as $QaPackage tar -C files -xf -"
-& $Adb shell sh -c $CopyCommand
+$CopyCommand = "run-as $BaselinePackage toybox tar -C files -cf - res | run-as $QaPackage toybox tar -C files -xf -"
+$CopyOutput = @(& $Adb shell $CopyCommand 2>&1 | ForEach-Object { $_.ToString() })
 if ($LASTEXITCODE -ne 0) {
-    throw 'On-device baseline-to-QA game-data copy failed.'
+    throw "On-device baseline-to-QA game-data copy failed. Output: $($CopyOutput -join '; ')"
 }
 
 $QaDataCount = Get-PrivateFileCount -PackageName $QaPackage -Directory 'files/res/data'
