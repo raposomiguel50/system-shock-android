@@ -6,7 +6,8 @@ An unofficial native Android/ARM64 adaptation of [Shockolate](https://github.com
 **Reproduction guide:** [Build it yourself](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/)  
 **Engineering knowledge base:** [Problems, decisions, standards and lessons](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/)  
 **Latest public source preview:** [v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)  
-**Feedback and testing:** [Open a structured report](https://github.com/raposomiguel50/system-shock-android/issues/new/choose)
+**Feedback and testing:** [Open a structured report](https://github.com/raposomiguel50/system-shock-android/issues/new/choose)  
+**ModDB:** [System Shock - Android](https://www.moddb.com/mods/system-shock-android)
 
 This public snapshot is intended to make the engineering work inspectable and reproducible. It contains the redistributable source and Android project, but **does not contain System Shock game data**. You must provide compatible game data from a legally obtained copy separately.
 
