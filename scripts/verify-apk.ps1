@@ -61,6 +61,11 @@ foreach ($ToolPath in @($Aapt2,$ApkSigner)) {
     }
 }
 
+$ApkAnalyzer = Join-Path $AndroidSdk 'cmdline-tools\latest\bin\apkanalyzer.bat'
+if (-not (Test-Path -LiteralPath $ApkAnalyzer -PathType Leaf)) {
+    $ApkAnalyzer = $null
+}
+
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $Zip = [IO.Compression.ZipFile]::OpenRead($Apk)
 try {
@@ -125,12 +130,42 @@ $IconLines = @($ManifestLines | Select-String -Pattern ':icon\(')
 if ($IconLines.Count -lt 1) {
     throw 'Compiled launcher icon is missing from AndroidManifest.xml.'
 }
-$DebuggableLines = @($ManifestLines | Select-String -Pattern ':debuggable\(')
+
+$DebuggableSource = 'aapt2'
 $IsDebuggable = $false
-if ($DebuggableLines.Count -gt 0) {
-    $DebuggableText = $DebuggableLines[0].ToString()
-    $IsDebuggable = ($DebuggableText -match '=0xffffffff' -or $DebuggableText -match 'Raw:\s+"true"')
+if ($ApkAnalyzer) {
+    $DebuggableOutput = (& $ApkAnalyzer manifest debuggable $Apk 2>&1 | Out-String).Trim().ToLowerInvariant()
+    if ($LASTEXITCODE -ne 0) {
+        throw "apkanalyzer manifest debuggable failed: $LASTEXITCODE"
+    }
+    if ($DebuggableOutput -notin @('true','false')) {
+        throw "Unable to parse apkanalyzer debuggable output: $DebuggableOutput"
+    }
+    $IsDebuggable = [bool]::Parse($DebuggableOutput)
+    $DebuggableSource = 'apkanalyzer'
 }
+else {
+    $DebuggableLines = @($ManifestLines | Select-String -Pattern ':debuggable\(')
+    if ($DebuggableLines.Count -eq 0) {
+        $IsDebuggable = $false
+    }
+    elseif ($DebuggableLines.Count -eq 1) {
+        $DebuggableText = $DebuggableLines[0].ToString()
+        if ($DebuggableText -match '\(type\s+0x12\)0xffffffff(?:\s|$)') {
+            $IsDebuggable = $true
+        }
+        elseif ($DebuggableText -match '\(type\s+0x12\)0x0(?:\s|$)') {
+            $IsDebuggable = $false
+        }
+        else {
+            throw "Unable to parse AAPT2 debuggable boolean: $DebuggableText"
+        }
+    }
+    else {
+        throw "Unexpected number of debuggable attributes in compiled manifest: $($DebuggableLines.Count)"
+    }
+}
+
 if ($IsDebuggable -ne $VariantInfo.Debuggable) {
     throw "Debuggable flag mismatch for variant '$Variant'. Expected $($VariantInfo.Debuggable), found $IsDebuggable"
 }
@@ -168,5 +203,6 @@ Write-Host "PACKAGE=$ActualPackage"
 Write-Host "VERSION_CODE=$ActualVersionCode"
 Write-Host "VERSION_NAME=$ActualVersionName"
 Write-Host "DEBUGGABLE=$IsDebuggable"
+Write-Host "DEBUGGABLE_SOURCE=$DebuggableSource"
 Write-Host "SIGNER_SHA256=$SignerDigest"
 Write-Host "SHA256=$((Get-FileHash -LiteralPath $Apk -Algorithm SHA256).Hash.ToLowerInvariant())"
