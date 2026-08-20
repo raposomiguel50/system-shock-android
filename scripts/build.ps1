@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('debug','qa','release')][string]$Variant = 'debug',
+    [ValidateSet('debug','qa','releaseQa','release')][string]$Variant = 'debug',
     [string]$AndroidSdk = '',
     [string]$JavaHome = $env:JAVA_HOME,
     [string]$DepsRoot = (Join-Path (Split-Path -Parent $PSScriptRoot) '.deps')
@@ -40,6 +40,12 @@ $VariantInfo = switch ($Variant) {
         [pscustomobject]@{
             Task = ':app:assembleQa'
             Apk = 'app\build\outputs\apk\qa\app-qa.apk'
+        }
+    }
+    'releaseQa' {
+        [pscustomobject]@{
+            Task = ':app:assembleReleaseQa'
+            Apk = 'app\build\outputs\apk\releaseQa\app-releaseQa.apk'
         }
     }
     'release' {

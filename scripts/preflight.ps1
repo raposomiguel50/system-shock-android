@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('debug','qa','release')][string]$Variant = 'debug',
+    [ValidateSet('debug','qa','releaseQa','release')][string]$Variant = 'debug',
     [string]$AndroidSdk = '',
     [string]$JavaHome = $env:JAVA_HOME,
     [string]$DepsRoot = (Join-Path (Split-Path -Parent $PSScriptRoot) '.deps'),
@@ -96,7 +96,8 @@ if (-not $SkipGitCleanCheck) {
     }
 }
 
-if ($Variant -eq 'release') {
+$RequiresReleaseSigning = $Variant -in @('releaseQa','release')
+if ($RequiresReleaseSigning) {
     $RequiredSigningVariables = @(
         'RP5NP_RELEASE_STORE_FILE',
         'RP5NP_RELEASE_STORE_PASSWORD',
@@ -122,6 +123,6 @@ Write-Host "JAVA_HOME=$JavaHome"
 Write-Host "ANDROID_SDK=$AndroidSdk"
 Write-Host "SDL2_COMMIT=$($DependencyExpectations[0].Commit)"
 Write-Host "SDL2_MIXER_COMMIT=$($DependencyExpectations[1].Commit)"
-if ($Variant -eq 'release') {
+if ($RequiresReleaseSigning) {
     Write-Host 'RELEASE_SIGNING=CONFIGURED'
 }

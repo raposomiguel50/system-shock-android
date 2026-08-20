@@ -64,6 +64,17 @@ android {
                 signingConfig signingConfigs.release
             }
         }
+
+        releaseQa {
+            initWith release
+            applicationIdSuffix ".releaseqa"
+            versionNameSuffix "-releaseqa"
+            debuggable false
+            minifyEnabled false
+            if (releaseSigningConfigured) {
+                signingConfig signingConfigs.release
+            }
+        }
     }
 
     externalNativeBuild {
