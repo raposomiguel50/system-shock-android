@@ -61,17 +61,17 @@ function Test-PrivateDirectory {
     return ($LASTEXITCODE -eq 0)
 }
 
-function Get-PrivateFileCount {
+function Get-PrivateFileList {
     param(
         [Parameter(Mandatory=$true)][string]$PackageName,
         [Parameter(Mandatory=$true)][string]$Directory
     )
-    $RemoteCommand = "run-as $PackageName find $Directory -type f"
-    $Lines = @(& $Adb shell $RemoteCommand 2>&1 | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ })
+    $RemoteCommand = "run-as $PackageName /system/bin/toybox find $Directory -type f"
+    $Lines = @(& $Adb shell $RemoteCommand 2>&1 | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ } | Sort-Object)
     if ($LASTEXITCODE -ne 0) {
         throw "Unable to enumerate files for $PackageName/$Directory. Output: $($Lines -join '; ')"
     }
-    return $Lines.Count
+    return $Lines
 }
 
 $BaselinePathBefore = @(Get-PackagePath -PackageName $BaselinePackage)
@@ -88,14 +88,14 @@ if (-not (Test-PrivateDirectory -PackageName $BaselinePackage -Directory 'files/
     throw 'Baseline app-private files/res/sound is unavailable through run-as.'
 }
 
-$TarHelp = (& $Adb shell toybox tar --help 2>&1 | Out-String)
+$TarHelp = (& $Adb shell /system/bin/toybox tar --help 2>&1 | Out-String)
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($TarHelp)) {
     throw 'Android toybox tar is unavailable; refusing an unverified data-copy path.'
 }
 
-$BaselineDataCount = Get-PrivateFileCount -PackageName $BaselinePackage -Directory 'files/res/data'
-$BaselineSoundCount = Get-PrivateFileCount -PackageName $BaselinePackage -Directory 'files/res/sound'
-if ($BaselineDataCount -lt 1 -or $BaselineSoundCount -lt 1) {
+$BaselineDataFiles = @(Get-PrivateFileList -PackageName $BaselinePackage -Directory 'files/res/data')
+$BaselineSoundFiles = @(Get-PrivateFileList -PackageName $BaselinePackage -Directory 'files/res/sound')
+if ($BaselineDataFiles.Count -lt 1 -or $BaselineSoundFiles.Count -lt 1) {
     throw 'Baseline game-data directories are unexpectedly empty.'
 }
 
@@ -116,16 +116,19 @@ if ($LASTEXITCODE -ne 0) {
     throw 'Unable to prepare QA app-private files directory.'
 }
 
-$CopyCommand = "run-as $BaselinePackage toybox tar -C files -cf - res | run-as $QaPackage toybox tar -C files -xf -"
+$CopyCommand = "run-as $BaselinePackage /system/bin/toybox tar -C files -cf - res | run-as $QaPackage /system/bin/toybox tar -C files -xf -"
 $CopyOutput = @(& $Adb shell $CopyCommand 2>&1 | ForEach-Object { $_.ToString() })
 if ($LASTEXITCODE -ne 0) {
     throw "On-device baseline-to-QA game-data copy failed. Output: $($CopyOutput -join '; ')"
 }
 
-$QaDataCount = Get-PrivateFileCount -PackageName $QaPackage -Directory 'files/res/data'
-$QaSoundCount = Get-PrivateFileCount -PackageName $QaPackage -Directory 'files/res/sound'
-if ($QaDataCount -ne $BaselineDataCount -or $QaSoundCount -ne $BaselineSoundCount) {
-    throw "QA game-data count mismatch. data $QaDataCount/$BaselineDataCount, sound $QaSoundCount/$BaselineSoundCount"
+$QaDataFiles = @(Get-PrivateFileList -PackageName $QaPackage -Directory 'files/res/data')
+$QaSoundFiles = @(Get-PrivateFileList -PackageName $QaPackage -Directory 'files/res/sound')
+
+$DataDiff = @(Compare-Object -ReferenceObject $BaselineDataFiles -DifferenceObject $QaDataFiles)
+$SoundDiff = @(Compare-Object -ReferenceObject $BaselineSoundFiles -DifferenceObject $QaSoundFiles)
+if ($DataDiff.Count -gt 0 -or $SoundDiff.Count -gt 0) {
+    throw "QA game-data file-list mismatch. data differences=$($DataDiff.Count), sound differences=$($SoundDiff.Count)"
 }
 
 $BaselinePathAfter = @(Get-PackagePath -PackageName $BaselinePackage)
@@ -141,6 +144,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host 'INSTALL_QA_FROM_BASELINE=PASS'
 Write-Host "QA_PACKAGE=$QaPackage"
 Write-Host "BASELINE_PACKAGE=$BaselinePackage"
-Write-Host "DATA_FILES=$QaDataCount"
-Write-Host "SOUND_FILES=$QaSoundCount"
+Write-Host "DATA_FILES=$($QaDataFiles.Count)"
+Write-Host "SOUND_FILES=$($QaSoundFiles.Count)"
+Write-Host 'FILE_LIST_MATCH=PASS'
 Write-Host 'BASELINE_PRESERVED=PASS'
