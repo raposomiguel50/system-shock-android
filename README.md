@@ -2,12 +2,27 @@
 
 An unofficial native Android/ARM64 adaptation of [Shockolate](https://github.com/Interrupt/systemshock), developed with the Retroid Pocket 5 as the primary reference device.
 
+**Project website:** [Miguel's Game Dev Lab - System Shock Android](https://raposomiguel50.github.io/projects/system-shock-android/)  
+**Reproduction guide:** [Build it yourself](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/)  
+**Engineering knowledge base:** [Problems, decisions, standards and lessons](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/)  
+**Latest public source preview:** [v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)  
+**Feedback and testing:** [Open a structured report](https://github.com/raposomiguel50/system-shock-android/issues/new/choose)
+
 This public snapshot is intended to make the engineering work inspectable and reproducible. It contains the redistributable source and Android project, but **does not contain System Shock game data**. You must provide compatible game data from a legally obtained copy separately.
+
+## Start here
+
+- If you want to see what the port does and how it differs from the original PC interaction model, start with the [project page](https://raposomiguel50.github.io/projects/system-shock-android/).
+- If you want to build it, use the [reproduction guide](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/).
+- If you are interested in the engineering work, failed experiments and reusable lessons, use the [knowledge base](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/).
+- If you tested it on another Android device, submit a [compatibility report](https://github.com/raposomiguel50/system-shock-android/issues/new?template=compatibility_report.yml).
 
 ## Status
 
 - Development state: **pre-release / active development**
 - Latest public source preview: **[v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)**
+- Fresh source checkout + dependency bootstrap: **PASS**
+- APK fresh-clone build: **in validation**
 - Validated reference device: **Retroid Pocket 5**
 - Current validated implementation baseline: **P2.0B + P2.0A Hor+**
 - Architecture: **Android / ARM64 (`arm64-v8a`)**
@@ -56,7 +71,7 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution and evidence guideline
 
 ## Knowledge base
 
-The project documents not only successful changes but also failed experiments, root causes, operational concerns, validation evidence and reusable engineering rules. Start with [`docs/KNOWLEDGE_BASE.md`](docs/KNOWLEDGE_BASE.md).
+The project documents not only successful changes but also failed experiments, root causes, operational concerns, validation evidence and reusable engineering rules. Start with the public [Engineering Knowledge Base](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/) or [`docs/KNOWLEDGE_BASE.md`](docs/KNOWLEDGE_BASE.md).
 
 ## Important boundary
 
