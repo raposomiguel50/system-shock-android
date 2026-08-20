@@ -45,6 +45,18 @@ This public snapshot is intended to make the engineering work inspectable and re
 
 The game presentation is intentionally kept in 4:3. The Android IME keyboard shown during text entry is the only platform-specific visual addition to the original game presentation.
 
+## Development attribution and AI assistance
+
+This project is human-directed and AI-assisted.
+
+Miguel Raposo defines the project goals, design, target platforms, constraints, feature priorities, interaction model, presentation choices, acceptance criteria and final decisions. Creative direction, critical evaluation, decisions about what to implement or reject, hardware testing and final approval remain under his control.
+
+ChatGPT is used extensively as a development assistant. Its role includes code drafting and modification, refactoring, debugging support, PowerShell and build automation, technical analysis, documentation, reproducibility work and release-engineering assistance.
+
+AI-generated code, technical proposals and documentation are not treated as authoritative or accepted automatically. They are reviewed against the intended design, tested where applicable, and may be modified or rejected. Failed approaches and incorrect assumptions are also documented when they provide useful engineering knowledge.
+
+Accordingly, the project should be understood as Miguel Raposo's design, direction and engineering judgment implemented with substantial AI assistance, rather than as an autonomously AI-generated project.
+
 ## Reproduce the build
 
 1. Read [`docs/BUILD.md`](docs/BUILD.md).
