@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet('debug','qa','release')][string]$Variant = 'debug',
+    [ValidateSet('debug','qa','releaseQa','release')][string]$Variant = 'debug',
     [string]$Apk = '',
     [string]$AndroidSdk = ''
 )
@@ -26,6 +26,7 @@ $VariantInfo = switch ($Variant) {
             Package = 'com.rp5np.systemshock'
             VersionName = '0.1.0-pre.3'
             Debuggable = $true
+            ReleaseSigned = $false
         }
     }
     'qa' {
@@ -34,6 +35,16 @@ $VariantInfo = switch ($Variant) {
             Package = 'com.rp5np.systemshock.qa'
             VersionName = '0.1.0-pre.3-qa'
             Debuggable = $true
+            ReleaseSigned = $false
+        }
+    }
+    'releaseQa' {
+        [pscustomobject]@{
+            Apk = 'AndroidProject\app\build\outputs\apk\releaseQa\app-releaseQa.apk'
+            Package = 'com.rp5np.systemshock.releaseqa'
+            VersionName = '0.1.0-pre.3-releaseqa'
+            Debuggable = $false
+            ReleaseSigned = $true
         }
     }
     'release' {
@@ -42,6 +53,7 @@ $VariantInfo = switch ($Variant) {
             Package = 'com.rp5np.systemshock'
             VersionName = '0.1.0-pre.3'
             Debuggable = $false
+            ReleaseSigned = $true
         }
     }
 }
@@ -130,6 +142,10 @@ $IconLines = @($ManifestLines | Select-String -Pattern ':icon\(')
 if ($IconLines.Count -lt 1) {
     throw 'Compiled launcher icon is missing from AndroidManifest.xml.'
 }
+$LauncherLines = @($ManifestLines | Select-String -Pattern 'LauncherActivity')
+if ($LauncherLines.Count -lt 1) {
+    throw 'Compiled launcher activity is missing from AndroidManifest.xml.'
+}
 
 $DebuggableSource = 'aapt2'
 $IsDebuggable = $false
@@ -184,9 +200,9 @@ if ($SignerText -match 'Signer #1 certificate DN:\s*(?<dn>.+)') {
     $SignerDn = $Matches.dn.Trim()
 }
 
-if ($Variant -eq 'release') {
+if ($VariantInfo.ReleaseSigned) {
     if ($SignerDn -match 'CN=Android Debug') {
-        throw 'Release APK is signed with the generic Android debug certificate.'
+        throw "$Variant APK is signed with the generic Android debug certificate."
     }
     $ExpectedReleaseDigest = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
     if (-not [string]::IsNullOrWhiteSpace($ExpectedReleaseDigest)) {
