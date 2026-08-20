@@ -6,7 +6,7 @@ An unofficial native Android/ARM64 adaptation of [Shockolate](https://github.com
 **Reproduction guide:** [Build it yourself](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/)  
 **Engineering knowledge base:** [Problems, decisions, standards and lessons](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/)  
 **Development method:** [Human direction, AI assistance, handovers and evidence](docs/DEVELOPMENT_METHOD.md)  
-**Latest public source preview:** [v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)  
+**Latest public release:** [v0.1.0-pre.3](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.3)  
 **Feedback and testing:** [Open a structured report](https://github.com/raposomiguel50/system-shock-android/issues/new/choose)  
 **ModDB:** [System Shock - Android](https://www.moddb.com/mods/system-shock-android)
 
@@ -23,12 +23,16 @@ This public snapshot is intended to make the engineering work inspectable and re
 ## Status
 
 - Development state: **pre-release / active development**
-- Latest public source preview: **[v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)**
+- Latest public release: **[v0.1.0-pre.3](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.3)**
 - Fresh source checkout + dependency bootstrap: **PASS**
-- APK fresh-clone build: **in validation**
+- Fresh-clone QA build and semantic APK verification: **PASS**
+- Signed non-debuggable release build: **PASS**
+- First-run Android game-data importer: **PASS on Retroid Pocket 5**
 - Validated reference device: **Retroid Pocket 5**
 - Current presentation: **1024x768 4:3 only, no stretch**
 - Architecture: **Android / ARM64 (`arm64-v8a`)**
+- Android package: **`com.rp5np.systemshock`**
+- Public Android version: **`versionCode 13`, `versionName 0.1.0-pre.3`**
 - Upstream Shockolate baseline: [`4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690`](https://github.com/Interrupt/systemshock/commit/4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690)
 - SDL baseline: **2.32.10**, commit [`5d249570393f7a37e037abf22cd6012a4cc56a71`](https://github.com/libsdl-org/SDL/commit/5d249570393f7a37e037abf22cd6012a4cc56a71)
 - SDL_mixer: **2.8.1**, commit [`171eb2d420d5643e4ee11514a06e04a41a463bbd`](https://github.com/libsdl-org/SDL_mixer/commit/171eb2d420d5643e4ee11514a06e04a41a463bbd)
@@ -43,9 +47,24 @@ This public snapshot is intended to make the engineering work inspectable and re
 - Optional touchscreen pointer interaction.
 - Android IME text entry for the original player-name workflow.
 - SDL_mixer/ADLMIDI audio path with a host-stall-resistant gameplay music clock.
+- First-run Android Storage Access Framework importer for a legally obtained System Shock `res` folder containing `data` and `sound`.
+- Import staging and rollback logic so an incomplete import is not activated as the live game-data directory.
 - Private-resource research tooling and HD experiments kept separate from redistributable source.
 
 The game presentation is intentionally kept in 4:3. The Android IME keyboard shown during text entry is the only platform-specific visual addition to the original game presentation.
+
+## Install and first run
+
+The release APK does not contain commercial System Shock resources.
+
+1. Install the APK from the GitHub release.
+2. Copy or otherwise make your legally obtained System Shock `res` folder available on the Android device.
+3. Launch System Shock.
+4. When prompted, choose **Select res folder**.
+5. Select the `res` folder that contains both `data` and `sound`, then approve access.
+6. The app copies the required files into its private storage and launches the game.
+
+After a successful import, normal launches go directly to the game while the imported private data remains present. See [`docs/INSTALL.md`](docs/INSTALL.md) and [`docs/GAME_DATA.md`](docs/GAME_DATA.md) for details.
 
 ## Development attribution and AI assistance
 
@@ -67,12 +86,11 @@ Read the full [development method, attribution and AI-assistance document](docs/
 
 1. Read [`docs/BUILD.md`](docs/BUILD.md).
 2. Run `scripts/bootstrap-deps.ps1` to obtain the pinned public dependencies.
-3. Run `scripts/build.ps1` to build a debug APK.
-4. Run `scripts/verify-apk.ps1` to inspect the APK before installing it.
-5. Read [`docs/GAME_DATA.md`](docs/GAME_DATA.md) and supply your own compatible `res/data` and `res/sound` content.
-6. For the current developer/debug workflow, use `scripts/install-debug.ps1` to install the APK and copy your own data into app-private storage.
+3. Run `scripts/qa-gate.ps1` for the isolated QA build and verifier.
+4. For a signed public release build, configure the release signing variables described in [`docs/RELEASE.md`](docs/RELEASE.md) and run `scripts/release-gate.ps1`.
+5. Read [`docs/GAME_DATA.md`](docs/GAME_DATA.md) for the commercial-data boundary and first-run importer behavior.
 
-The current data-import workflow deliberately uses a **debug build + ADB**. A user-friendly release importer is still an open item; see [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md).
+The release APK and source tree do not redistribute System Shock commercial game data.
 
 ## Feedback, testing and contributions
 
