@@ -1,8 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: System Shock Android - project website
+    url: https://raposomiguel50.github.io/projects/system-shock-android/
+    about: Overview, controls, project status, releases and public documentation.
+  - name: Engineering knowledge base
+    url: https://raposomiguel50.github.io/projects/system-shock-android/knowledge/
+    about: Resolved problems, open concerns, standards, rejected experiments and reusable lessons.
   - name: Professional contact - LinkedIn
     url: https://www.linkedin.com/in/miguel-raposo-7192a251/
     about: Contact Miguel for professional networking or private professional enquiries.
-  - name: Miguel's Game Dev Lab
-    url: https://raposomiguel50.github.io/
-    about: Project pages, development notes and public technical documentation.
