@@ -51,15 +51,15 @@ The game presentation is intentionally kept in 4:3. The Android IME keyboard sho
 
 This project is human-directed and AI-assisted.
 
-Miguel Raposo defines the project goals, design, target platforms, constraints, feature priorities, interaction model, presentation choices, acceptance criteria and final decisions. Creative direction, critical evaluation, decisions about what to implement or reject, hardware testing and final approval remain under his control.
+I define the project goals, design, target platforms, constraints, feature priorities, interaction model, presentation choices, acceptance criteria and final decisions. Creative direction, critical evaluation, decisions about what to implement or reject, hardware testing and final approval remain under my control.
 
-ChatGPT is used extensively as a development assistant. Its role includes calculations, code drafting and modification, refactoring, debugging support, PowerShell and build automation, repetitive technical and repository work, technical analysis, documentation, reproducibility work and release-engineering assistance.
+I use ChatGPT extensively as a development assistant. Its role includes calculations, code drafting and modification, refactoring, debugging support, PowerShell and build automation, repetitive technical and repository work, technical analysis, documentation, reproducibility work and release-engineering assistance.
 
-AI-generated code, technical proposals and documentation are not treated as authoritative or accepted automatically. They are reviewed against the intended design, tested where applicable, and may be modified or rejected. Failed approaches and incorrect assumptions are also documented when they provide useful engineering knowledge.
+I do not treat AI-generated code, technical proposals or documentation as authoritative or accept them automatically. I review them against the intended design, test them where applicable, and may modify or reject them. Failed approaches and incorrect assumptions are also documented when they provide useful engineering knowledge.
 
-The project workflow itself is part of the human contribution. Project organization, explicit checkpoints, versioned handovers, evidence bundles, hashes, recovery rules and real-hardware approval are used to compensate for limitations such as lost context, incorrect assumptions and repeated AI errors.
+The project workflow itself is part of my contribution. I use project organization, explicit checkpoints, versioned handovers, evidence bundles, hashes, recovery rules and real-hardware approval to compensate for limitations such as lost context, incorrect assumptions and repeated AI errors.
 
-Accordingly, the project should be understood as Miguel Raposo's design, direction, process and engineering judgment implemented with substantial AI assistance. ChatGPT saves time by carrying a large amount of programming, calculation, automation and grind work, but it cannot independently preserve the project's intent, make its creative and critical decisions, validate the physical hardware or continue this specific project autonomously without Miguel Raposo's direction, constraints, evidence and approvals.
+The project should therefore be understood as my design, direction, process and engineering judgment implemented with substantial AI assistance. ChatGPT saves time by carrying a large amount of programming, calculation, automation and grind work, but it cannot independently preserve the project's intent, make its creative and critical decisions, validate the physical hardware or continue this specific project autonomously without my direction, constraints, evidence and approvals.
 
 Read the full [development method, attribution and AI-assistance document](docs/DEVELOPMENT_METHOD.md).
 
