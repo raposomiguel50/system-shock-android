@@ -52,12 +52,13 @@ This knowledge base is structured like an operational engineering record: **cont
 **Resolution:** Use SDL's monotonic high-resolution performance counter; after abnormal lateness, shift all active layer origins together rather than bursting overdue events.  
 **Reusable lesson:** Real-time media clocks should preserve intervals after stalls, not replay lateness at maximum speed.
 
-## KB-SS-007 - Widescreen without stretch
+## KB-SS-007 - 4:3 presentation retained as the current baseline
 
-**Status:** Validated prototype / current baseline  
-**Problem:** Filling a 16:9 display must not distort the original 4:3 scene/UI.  
-**Resolution:** 1366x768 Hor+ expands horizontal world coverage while keeping a centered 1024x768 legacy UI safe area. 4:3 remains a reversible fallback.  
-**Reusable lesson:** Preserve a reversible reference presentation before widening scene geometry.
+**Status:** Decision / current baseline  
+**Context:** A 16:9 expansion prototype was evaluated during development.  
+**Decision:** The current port does not expose a switchable widescreen mode. It retains the original-style 1024x768 4:3 no-stretch presentation as the only public presentation mode.  
+**Visual boundary:** The Android IME keyboard shown during text entry is the only platform-specific visual addition to the original game presentation.  
+**Reusable lesson:** A technically workable presentation experiment does not need to become a shipped feature when visual consistency and fidelity are better served by the reference format.
 
 ## KB-SS-008 - HD assets versus an indexed 8-bit renderer
 
