@@ -4,8 +4,14 @@ AndroidProject/.gradle/
 AndroidProject/local.properties
 AndroidProject/app/.cxx/
 AndroidProject/app/build/
+dist/
 *.apk
 *.aab
+
+# Signing material must never be committed
+*.jks
+*.keystore
+release-signing.properties
 
 # Proprietary System Shock data must never be committed
 # Only the repository-root /res/ directory is proprietary game data.
