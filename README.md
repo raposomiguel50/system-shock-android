@@ -5,6 +5,7 @@ An unofficial native Android/ARM64 adaptation of [Shockolate](https://github.com
 **Project website:** [Miguel's Game Dev Lab - System Shock Android](https://raposomiguel50.github.io/projects/system-shock-android/)  
 **Reproduction guide:** [Build it yourself](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/)  
 **Engineering knowledge base:** [Problems, decisions, standards and lessons](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/)  
+**Development method:** [Human direction, AI assistance, handovers and evidence](docs/DEVELOPMENT_METHOD.md)  
 **Latest public source preview:** [v0.1.0-pre.2](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.2)  
 **Feedback and testing:** [Open a structured report](https://github.com/raposomiguel50/system-shock-android/issues/new/choose)  
 **ModDB:** [System Shock - Android](https://www.moddb.com/mods/system-shock-android)
@@ -16,6 +17,7 @@ This public snapshot is intended to make the engineering work inspectable and re
 - If you want to see what the port does and how it differs from the original PC interaction model, start with the [project page](https://raposomiguel50.github.io/projects/system-shock-android/).
 - If you want to build it, use the [reproduction guide](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/).
 - If you are interested in the engineering work, failed experiments and reusable lessons, use the [knowledge base](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/).
+- If you want to understand how human direction, ChatGPT assistance, handovers, evidence and recovery are separated, read the [development method](docs/DEVELOPMENT_METHOD.md).
 - If you tested it on another Android device, submit a [compatibility report](https://github.com/raposomiguel50/system-shock-android/issues/new?template=compatibility_report.yml).
 
 ## Status
@@ -51,11 +53,15 @@ This project is human-directed and AI-assisted.
 
 Miguel Raposo defines the project goals, design, target platforms, constraints, feature priorities, interaction model, presentation choices, acceptance criteria and final decisions. Creative direction, critical evaluation, decisions about what to implement or reject, hardware testing and final approval remain under his control.
 
-ChatGPT is used extensively as a development assistant. Its role includes code drafting and modification, refactoring, debugging support, PowerShell and build automation, technical analysis, documentation, reproducibility work and release-engineering assistance.
+ChatGPT is used extensively as a development assistant. Its role includes calculations, code drafting and modification, refactoring, debugging support, PowerShell and build automation, repetitive technical and repository work, technical analysis, documentation, reproducibility work and release-engineering assistance.
 
 AI-generated code, technical proposals and documentation are not treated as authoritative or accepted automatically. They are reviewed against the intended design, tested where applicable, and may be modified or rejected. Failed approaches and incorrect assumptions are also documented when they provide useful engineering knowledge.
 
-Accordingly, the project should be understood as Miguel Raposo's design, direction and engineering judgment implemented with substantial AI assistance, rather than as an autonomously AI-generated project.
+The project workflow itself is part of the human contribution. Project organization, explicit checkpoints, versioned handovers, evidence bundles, hashes, recovery rules and real-hardware approval are used to compensate for limitations such as lost context, incorrect assumptions and repeated AI errors.
+
+Accordingly, the project should be understood as Miguel Raposo's design, direction, process and engineering judgment implemented with substantial AI assistance. ChatGPT saves time by carrying a large amount of programming, calculation, automation and grind work, but it cannot independently preserve the project's intent, make its creative and critical decisions, validate the physical hardware or continue this specific project autonomously without Miguel Raposo's direction, constraints, evidence and approvals.
+
+Read the full [development method, attribution and AI-assistance document](docs/DEVELOPMENT_METHOD.md).
 
 ## Reproduce the build
 
