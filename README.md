@@ -24,7 +24,7 @@ This public snapshot is intended to make the engineering work inspectable and re
 - Fresh source checkout + dependency bootstrap: **PASS**
 - APK fresh-clone build: **in validation**
 - Validated reference device: **Retroid Pocket 5**
-- Current validated implementation baseline: **P2.0B + P2.0A Hor+**
+- Current presentation: **1024x768 4:3 only, no stretch**
 - Architecture: **Android / ARM64 (`arm64-v8a`)**
 - Upstream Shockolate baseline: [`4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690`](https://github.com/Interrupt/systemshock/commit/4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690)
 - SDL baseline: **2.32.10**, commit [`5d249570393f7a37e037abf22cd6012a4cc56a71`](https://github.com/libsdl-org/SDL/commit/5d249570393f7a37e037abf22cd6012a4cc56a71)
@@ -34,14 +34,15 @@ This public snapshot is intended to make the engineering work inspectable and re
 ## What is implemented
 
 - Native Android/ARM64 build rather than desktop emulation.
-- 1024×768 4:3 no-stretch baseline.
-- Reversible 1366×768 Hor+ presentation with a centered 1024×768 UI safe area.
+- 1024x768 4:3 no-stretch presentation.
 - Retroid Pocket 5 controller integration using SDL GameController semantics.
 - Right stick controls camera look by default; View/Select toggles fine cursor mode.
 - Optional touchscreen pointer interaction.
 - Android IME text entry for the original player-name workflow.
 - SDL_mixer/ADLMIDI audio path with a host-stall-resistant gameplay music clock.
 - Private-resource research tooling and HD experiments kept separate from redistributable source.
+
+The game presentation is intentionally kept in 4:3. The Android IME keyboard shown during text entry is the only platform-specific visual addition to the original game presentation.
 
 ## Reproduce the build
 
