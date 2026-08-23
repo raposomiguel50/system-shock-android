@@ -23,7 +23,7 @@ The coverage specifically highlights:
 - the fact that commercial game data is not included in the APK;
 - the pre-release status and the fact that broader Android-device compatibility is not yet established.
 
-The article links readers to the public project/release ecosystem and represents the first recorded independent editorial coverage of this Android port.
+This represents the first recorded independent editorial coverage of this Android port.
 
 ## Record-keeping policy
 
