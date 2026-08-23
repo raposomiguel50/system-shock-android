@@ -1,0 +1,68 @@
+name: Fix v0.1.0-pre.3 release notes
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/fix-v0.1.0-pre.3-release.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  fix-release-notes:
+    name: Replace malformed v0.1.0-pre.3 release notes
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_BODY: |
+        First APK-bearing public pre-release of the Android/ARM64 port.
+
+        ## Included
+
+        - Native Android/ARM64 build for `arm64-v8a`.
+        - 1024x768 4:3 presentation with no stretch.
+        - Retroid Pocket 5 controller integration.
+        - Right-stick camera look and fine cursor mode.
+        - Optional touchscreen pointer input.
+        - Android IME support for text entry.
+        - SDL_mixer/ADLMIDI audio path.
+        - First-run Android folder importer for the user's own compatible System Shock `res` folder containing `data` and `sound`.
+
+        ## Installation
+
+        1. Install `SystemShock-Android-v0.1.0-pre.3-arm64-v8a.apk`.
+        2. Make a legally obtained compatible System Shock `res` folder available on the Android device.
+        3. Launch the app.
+        4. Choose **Select res folder**.
+        5. Select the `res` folder containing both `data` and `sound`.
+        6. Approve folder access. The app imports the data into private storage and launches the game.
+
+        Commercial System Shock game data is not included in the APK or source release.
+
+        ## Validation
+
+        - Reference device: Retroid Pocket 5.
+        - Fresh-clone dependency bootstrap: **PASS**.
+        - Signed release build: **PASS**.
+        - APK semantic verification: **PASS**.
+        - First-run Storage Access Framework importer: **PASS on Retroid Pocket 5**.
+        - Release package: `com.rp5np.systemshock`.
+        - Version code: `13`.
+        - Version name: `0.1.0-pre.3`.
+        - Release APK is non-debuggable.
+        - Source commit: `b51dbe495a0127754a82880dc3b38f736d937ce9`.
+        - APK SHA-256: `f7128eabd872ffd4f08644c05823b151992710c265d383c220b67796094155a9`.
+        - Signing certificate SHA-256: `7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409`.
+
+        This remains a pre-release. Broader Android-device compatibility is not yet established.
+
+    steps:
+      - name: Update release body through GitHub API
+        shell: bash
+        run: |
+          set -euo pipefail
+          release_id="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v0.1.0-pre.3" --jq '.id')"
+          printf '%s' "$RELEASE_BODY" | jq -Rs '{body: .}' > "$RUNNER_TEMP/release.json"
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" --input "$RUNNER_TEMP/release.json" >/dev/null
+          echo "RELEASE_NOTES_UPDATE=PASS"
