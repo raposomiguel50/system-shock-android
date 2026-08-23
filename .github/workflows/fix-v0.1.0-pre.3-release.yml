@@ -66,3 +66,17 @@ jobs:
           printf '%s' "$RELEASE_BODY" | jq -Rs '{body: .}' > "$RUNNER_TEMP/release.json"
           gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" --input "$RUNNER_TEMP/release.json" >/dev/null
           echo "RELEASE_NOTES_UPDATE=PASS"
+
+      - name: Remove temporary repair workflow after success
+        shell: bash
+        run: |
+          set -euo pipefail
+          path='.github/workflows/fix-v0.1.0-pre.3-release.yml'
+          file_sha="$(gh api "repos/${GITHUB_REPOSITORY}/contents/${path}?ref=${GITHUB_REF_NAME}" --jq '.sha')"
+          jq -n \
+            --arg message 'Remove temporary release-note repair workflow' \
+            --arg sha "$file_sha" \
+            --arg branch "$GITHUB_REF_NAME" \
+            '{message:$message,sha:$sha,branch:$branch}' > "$RUNNER_TEMP/delete-workflow.json"
+          gh api --method DELETE "repos/${GITHUB_REPOSITORY}/contents/${path}" --input "$RUNNER_TEMP/delete-workflow.json" >/dev/null
+          echo "TEMP_WORKFLOW_REMOVAL=PASS"
