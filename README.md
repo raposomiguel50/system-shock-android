@@ -8,7 +8,8 @@ An unofficial native Android/ARM64 adaptation of [Shockolate](https://github.com
 **Development method:** [Human direction, AI assistance, handovers and evidence](docs/DEVELOPMENT_METHOD.md)  
 **Latest public release:** [v0.1.0-pre.3](https://github.com/raposomiguel50/system-shock-android/releases/tag/v0.1.0-pre.3)  
 **Feedback and testing:** [Open a structured report](https://github.com/raposomiguel50/system-shock-android/issues/new/choose)  
-**ModDB:** [System Shock - Android](https://www.moddb.com/mods/system-shock-android)
+**ModDB:** [System Shock - Android](https://www.moddb.com/mods/system-shock-android)  
+**Press / external coverage:** [Coverage and project milestones](docs/PRESS.md)
 
 This public snapshot is intended to make the engineering work inspectable and reproducible. It contains the redistributable source and Android project, but **does not contain System Shock game data**. You must provide compatible game data from a legally obtained copy separately.
 
@@ -18,6 +19,7 @@ This public snapshot is intended to make the engineering work inspectable and re
 - If you want to build it, use the [reproduction guide](https://raposomiguel50.github.io/projects/system-shock-android/reproduce/).
 - If you are interested in the engineering work, failed experiments and reusable lessons, use the [knowledge base](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/).
 - If you want to understand how human direction, ChatGPT assistance, handovers, evidence and recovery are separated, read the [development method](docs/DEVELOPMENT_METHOD.md).
+- If you want to see independent editorial coverage of the project, read the [press and external coverage record](docs/PRESS.md).
 - If you tested it on another Android device, submit a [compatibility report](https://github.com/raposomiguel50/system-shock-android/issues/new?template=compatibility_report.yml).
 
 ## Status
@@ -110,6 +112,12 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution and evidence guideline
 ## Knowledge base
 
 The project documents not only successful changes but also failed experiments, root causes, operational concerns, validation evidence and reusable engineering rules. Start with the public [Engineering Knowledge Base](https://raposomiguel50.github.io/projects/system-shock-android/knowledge/) or [`docs/KNOWLEDGE_BASE.md`](docs/KNOWLEDGE_BASE.md).
+
+## Press and external coverage
+
+Independent editorial coverage is recorded separately from the technical release state so external attention does not alter the engineering baseline. The first recorded article is GenerationAmiga's 21 August 2026 feature, [“System Shock Android port brings the 1994 classic to handhelds”](https://www.generationamiga.com/2026/08/21/system-shock-android-port-brings-the-1994-classic-to-handhelds/).
+
+See [`docs/PRESS.md`](docs/PRESS.md) for the permanent coverage record and record-keeping policy.
 
 ## Important boundary
 
