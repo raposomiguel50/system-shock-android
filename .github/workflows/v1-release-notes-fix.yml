@@ -1,0 +1,83 @@
+name: Correct v1.0.0 release notes
+
+on:
+  pull_request:
+    paths:
+      - 'docs/RELEASE_NOTES_V1.0.0.md'
+
+permissions:
+  contents: write
+
+jobs:
+  correct-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Correct GitHub Release body and verify assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release_body.md <<'EOF'
+          # System Shock - Android v1.0.0
+
+          First stable preservation release of the native Android/ARM64 System Shock port based on Shockolate.
+
+          ## Stable baseline
+
+          - Native Android/ARM64 (`arm64-v8a`)
+          - Package: `io.github.raposomiguel50.systemshock`
+          - Version: `1.0.0` (`versionCode 10000`)
+          - 1024x768 4:3 presentation without non-uniform stretching
+          - Handheld controls with right-stick camera look and fine cursor mode
+          - Optional touchscreen pointer input
+          - Android IME text entry
+          - Android-compatible audio handling
+          - First-run Storage Access Framework importer for user-supplied compatible game data
+          - Retroid Pocket 5 validated as the reference target
+          - Complete start-to-finish reference-device playthrough accepted before release
+
+          The APK contains no commercial System Shock game data. Users provide compatible data from a legally obtained copy.
+
+          ## Install
+
+          1. Install `SystemShock-Android-v1.0.0-arm64-v8a.apk`.
+          2. Launch **System Shock - Android**.
+          3. Select a compatible `res` folder containing `data` and `sound`.
+
+          Normal users do not need ADB or developer tools.
+
+          ## Preservation boundary
+
+          Stable v1.0 does not add widescreen/Hor+, HD replacement graphics, remastered fonts, truecolor conversion, replacement audio, gameplay rebalance or new game content.
+
+          The historical pre-release used package `com.rp5np.systemshock`. Stable v1 uses `io.github.raposomiguel50.systemshock`; both packages may coexist. The stable line has its own long-lived signing identity for future compatible updates.
+
+          ## Verified release identity
+
+          - Source commit: `d40e02b00e5e59b956b18fdd2a13a41672090b2c`
+          - APK SHA-256: `a6dcb7f76374dd7d4f7e39f0ecc08446f2956a33bda7655d699d5ba639b8526f`
+          - Signing certificate SHA-256: `806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b`
+          - ABI: `arm64-v8a`
+          - Commercial game data included: **No**
+
+          The accompanying `.sha256`, JSON manifest and final-gate report provide machine-readable release evidence.
+          EOF
+          release_id="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v1.0.0" --jq '.id')"
+          gh api --method PATCH "repos/${GITHUB_REPOSITORY}/releases/${release_id}" \
+            -f name='System Shock - Android v1.0.0' \
+            -f body="$(cat release_body.md)" \
+            -F draft=false \
+            -F prerelease=false >/dev/null
+          body="$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v1.0.0" --jq '.body')"
+          printf '%s\n' "$body" | grep -Fq 'Package: `io.github.raposomiguel50.systemshock`'
+          printf '%s\n' "$body" | grep -Fq 'APK SHA-256: `a6dcb7f76374dd7d4f7e39f0ecc08446f2956a33bda7655d699d5ba639b8526f`'
+          printf '%s\n' "$body" | grep -Fq 'Signing certificate SHA-256: `806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b`'
+          assets="$(gh api "repos/${GITHUB_REPOSITORY}/releases/${release_id}/assets" --jq '.[].name')"
+          for name in \
+            SystemShock-Android-v1.0.0-arm64-v8a.apk \
+            SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256 \
+            SystemShock-Android-v1.0.0-release.json \
+            SystemShock-Android-v1.0.0-final-gate.txt; do
+            printf '%s\n' "$assets" | grep -Fxq "$name"
+          done
