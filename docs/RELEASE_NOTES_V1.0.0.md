@@ -69,3 +69,5 @@ The historical pre-release used `com.rp5np.systemshock`. Stable v1 uses `io.gith
 ## Legal boundary
 
 This is an unofficial source port based on Shockolate. System Shock commercial game data is not included. Users must supply compatible data from a legally obtained copy separately.
+
+<!-- release-page-sync-trigger -->
