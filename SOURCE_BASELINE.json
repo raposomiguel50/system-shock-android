@@ -1,12 +1,16 @@
 {
-  "schema": 3,
+  "schema": 4,
   "project": "System Shock — Android",
   "public_snapshot_date": "2026-08-24",
-  "release_candidate_version": "1.0.0",
-  "release_candidate_version_code": 10000,
+  "release_status": "stable",
+  "stable_release_version": "1.0.0",
+  "stable_release_version_code": 10000,
+  "release_source_commit": "d40e02b00e5e59b956b18fdd2a13a41672090b2c",
   "release_package": "io.github.raposomiguel50.systemshock",
   "historical_prerelease_package": "com.rp5np.systemshock",
   "application_label": "System Shock - Android",
+  "release_apk_sha256": "a6dcb7f76374dd7d4f7e39f0ecc08446f2956a33bda7655d699d5ba639b8526f",
+  "release_signing_certificate_sha256": "806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b",
   "upstream_repository": "https://github.com/Interrupt/systemshock",
   "upstream_commit": "4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690",
   "upstream_commit_subject": "Merge pull request #421 from oreo639/fix-gcc14",
@@ -28,7 +32,6 @@
   "validated_implementation_baseline": "v1.0 preservation baseline — 1024x768 4:3 no-stretch with Android access adaptations",
   "manual_complete_playthrough_accepted": true,
   "preservation_scope": "Original game presentation and content remain authoritative; HD, Hor+, font remaster, truecolor and gameplay/content changes are out of scope for stable v1.0.",
-  "stable_signing_policy": "A new dedicated stable signing identity is generated automatically for v1.0.0, recorded in release evidence, kept private, and reused for all future stable updates.",
-  "release_signing_certificate_sha256": null,
+  "stable_signing_policy": "The dedicated v1 stable signing identity is established and must be reused for all compatible future stable updates.",
   "proprietary_game_data_included": false
 }
