@@ -1,29 +1,45 @@
-# Publish the sanitized source to a dedicated GitHub repository
+# Publishing a public release
 
-The preferred public layout is a dedicated repository such as `system-shock-android`, rather than exposing the private development workspace or a handover archive.
+The dedicated public repository already exists at `raposomiguel50/system-shock-android`. Normal releases are published from the existing Git history; do not recreate the repository or publish from a private workspace snapshot.
 
-## GitHub setup
+## Stable-release source boundary
 
-Create an **empty public repository**. Do not initialize it with a README, `.gitignore` or license because those files already exist in this package.
+Before publishing `v1.0.0`:
 
-Suggested repository name:
+1. Freeze the accepted public source commit on `main`.
+2. Confirm the v1 preservation scope in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md).
+3. Complete the machine gates in [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
+4. Build the signed release from a clean checkout of the exact accepted commit.
+5. Retain the APK SHA-256, release JSON manifest and stable signing-certificate digest.
+6. Create tag `v1.0.0` on that exact commit.
+7. Publish the signed APK and its `.sha256` file through the GitHub release associated with that tag.
+8. Copy the final source commit and APK SHA-256 into the release notes.
+9. Only after the verified artifact is public, update the README, project website and ModDB from release-candidate/pre-release wording to stable `v1.0.0`.
+
+See [`INTEGRITY.md`](INTEGRITY.md) for the source/release identity model.
+
+## Required public artifacts
+
+The release gate produces:
 
 ```text
-system-shock-android
+dist/SystemShock-Android-v1.0.0-arm64-v8a.apk
+dist/SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256
+dist/SystemShock-Android-v1.0.0-release.json
 ```
 
-After extracting this public-source package, run from PowerShell 7:
+The APK and `.sha256` file should be attached to the GitHub release. The JSON manifest should be retained as release evidence and may also be published when useful for verification.
 
-```powershell
-pwsh -File .\scripts\publish-to-github.ps1 -RepositoryUrl 'https://github.com/YOUR-ACCOUNT/system-shock-android.git'
-```
+## Commercial-data boundary
 
-The helper initializes the extracted package as a `main` Git repository, commits every public file, adds the remote and pushes it. It never reads from the private RP5 development workspace.
+Before publication, confirm again that no commercial `res/data`, `res/sound`, `.res` files or other proprietary System Shock game data are present in the APK, repository additions or release attachments.
 
-## Before announcing the repository
+Users supply compatible game data separately from a legally obtained copy through the first-run Android importer.
 
-1. Confirm the source tree contains no commercial `res/data`, `res/sound` or `.res` assets.
-2. Confirm `SOURCE_BASELINE.json` identifies the Shockolate/SDL baselines.
-3. Confirm the GPL license and third-party notices are present.
-4. Run the clean-clone reproducibility sequence in `BUILD.md`.
-5. Record the successful clone/build/APK hash and tested device in the knowledge base.
+## Signing boundary
+
+The private release keystore and credentials never enter GitHub, source archives, CI artifacts or public release attachments. The stable public signing-certificate SHA-256 is documented and verified, but the private key remains private.
+
+## Historical publication helper
+
+`scripts/publish-to-github.ps1` was created for initial publication of a sanitized source package into an empty repository. It is retained as development history/utility and is **not** the normal path for current releases from the established repository.

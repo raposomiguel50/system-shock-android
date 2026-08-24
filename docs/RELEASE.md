@@ -4,7 +4,7 @@
 
 The release path is deliberately separate from normal development and QA. A public APK must not be produced from an arbitrary dirty workspace, a moved `.cxx` cache or the generic Android debug signing key.
 
-Stable v1.0 is a preservation release. Its product boundary is defined in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md), and its final checklist is tracked in [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
+Stable v1.0 is a preservation release. Its product boundary is defined in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md), its integrity model in [`INTEGRITY.md`](INTEGRITY.md), and its final checklist in [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
 
 ## Build identities
 
@@ -50,6 +50,12 @@ A release or release-QA APK signed with a different certificate fails verificati
 
 The private release key must be preserved for future compatible updates. Losing it prevents normal signed upgrades for users who installed an earlier APK under the same package ID.
 
+## Source identity
+
+The exact Git commit referenced by the release tag is the authoritative source identity. Historical root-level per-file checksum inventories were tied to older snapshots and are not maintained as the v1 source-integrity mechanism.
+
+The v1 release manifest must record the exact source commit used to produce the signed APK. See [`INTEGRITY.md`](INTEGRITY.md).
+
 ## Release gate
 
 From a clean checkout of the accepted source commit:
@@ -88,7 +94,7 @@ That manual product gate does not replace the final machine gates below. It mean
 
 A stable APK is publishable only after all of these are true:
 
-1. GitHub Actions QA passes from the exact v1.0.0 public source tree.
+1. GitHub Actions QA passes from the exact final v1.0.0 public source tree.
 2. A fresh local checkout passes dependency bootstrap, QA build and APK verification.
 3. The accepted source commit is fixed and recorded.
 4. The signed release build is generated from that exact commit with the established release key.
