@@ -2,7 +2,7 @@
 
 ## What is not included
 
-This source snapshot does **not** include proprietary System Shock resources. Do not commit them to this repository and do not attach them to source releases.
+This repository and its APK do **not** include proprietary System Shock resources. Do not commit commercial game data to this repository and do not attach it to public issues, source archives or releases.
 
 Shockolate expects compatible resources under a layout equivalent to:
 
@@ -12,34 +12,42 @@ res/
   sound/
 ```
 
-The upstream Shockolate documentation states that original CD-ROM or System Shock: Enhanced Edition assets are required; floppy-disk assets are not supported by that upstream baseline.
+The upstream Shockolate baseline expects assets from a compatible original CD-ROM or System Shock: Enhanced Edition installation; the upstream baseline does not support the floppy-disk asset set.
 
-## Current Android storage model
+## Public Android import path
 
-On Android, the native entry point changes its working directory to the app's internal storage using `SDL_AndroidGetInternalStoragePath()`. The game then opens relative paths such as `res/data/...` and `res/sound/...`.
+On first launch, if compatible game data is not already present in the app's private storage, the launcher asks the user to select a `res` folder through Android's Storage Access Framework.
 
-Therefore the current debug/developer workflow places your own `res` tree inside the app-private files directory.
+The selected directory must contain both `data` and `sound` directories.
 
-## Debug/ADB import
+The importer:
 
-After building a debug APK, connect an Android device with USB debugging enabled and run:
+1. reads the selected tree through Android's document APIs;
+2. copies `data` and `sound` into a temporary `res.importing` directory inside app-private storage;
+3. verifies that both imported directories contain data;
+4. preserves an existing live `res` directory as a temporary backup when necessary;
+5. activates the completed import only after copying succeeds;
+6. removes temporary staging/backup data after successful activation;
+7. attempts to restore the previous live directory if activation fails.
+
+The game then uses the original relative resource paths from the app-private working directory.
+
+## Storage and permissions boundary
+
+The public application does not need to bundle game data or request broad filesystem access. The user explicitly selects a folder and grants read access through the Android system picker.
+
+The imported app-private copy exists for runtime convenience. Keep the legally obtained source installation or archival copy separately. Uninstalling an Android application can remove its private storage.
+
+## Developer / ADB path
+
+Debug and QA workflows can still import a compatible `res` directory through the development helpers, for example:
 
 ```powershell
-pwsh -File .\scripts\install-debug.ps1 -GameRes 'D:\Path\To\Your\SystemShock\res'
+pwsh -File .\scripts\install-qa.ps1 -GameRes 'D:\Path\To\Your\SystemShock\res'
 ```
 
-`-GameRes` must point to the directory that contains both `data` and `sound`.
+That `run-as`/ADB path is a developer mechanism. It is not the normal end-user installation path for the stable release.
 
-The script:
+## Preservation rule
 
-1. Installs/reinstalls the debug APK.
-2. Copies your `data` and `sound` directories through a temporary ADB location.
-3. Uses Android `run-as` to place them in this debug application's private `files/res` directory.
-4. Removes the temporary copy.
-5. Launches the application.
-
-## Important limitation
-
-`run-as` is a developer/debug mechanism. It is not the intended long-term distribution path for a normal signed release. A public end-user release should implement a user-facing import flow (for example through Android's document/storage APIs) so that game owners can select their own data without ADB.
-
-That importer is tracked as an open engineering item rather than being hidden behind release packaging.
+The Android project treats the user's original game data as authoritative. Stable v1.0 does not replace it with HD assets, remastered fonts, modified maps, replacement audio or other content changes. See [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md).

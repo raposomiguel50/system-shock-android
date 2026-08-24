@@ -1,6 +1,6 @@
 # Known issues and open concerns
 
-This file deliberately separates unresolved work from already-proven behavior.
+This file deliberately separates unresolved work from already-proven behavior. Stable v1.0 follows the preservation boundary in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md); enhancement research outside that boundary is not a release blocker.
 
 ## REL-SS-001 - v0.1.0-pre.1 SDL_mixer bootstrap failure
 
@@ -26,45 +26,52 @@ This file deliberately separates unresolved work from already-proven behavior.
 **Status:** Fixed and validated.  
 **Symptom:** A clean checkout could reference `@mipmap/ic_launcher` while the Android resource directory was absent.  
 **Root cause:** The repository rule `res/`, intended for proprietary game data at the repository root, also ignored `AndroidProject/app/src/main/res/`.  
-**Resolution:** The proprietary-data rule is now anchored to `/res/`, while Android resources are tracked normally. The validated launcher resources are present in the public source tree.  
+**Resolution:** The proprietary-data rule is anchored to `/res/`, while Android resources are tracked normally.  
 **Validation:** Fresh build, semantic APK verification and compiled launcher-icon verification passed after the correction.
 
 ## REL-SS-004 - End-user game-data importer
 
-**Status:** Fixed and hardware validated for v0.1.0-pre.3.  
+**Status:** Fixed and hardware validated.  
 **Previous limitation:** The developer/QA flow required ADB and `run-as` to place commercial data in app-private storage, which is unsuitable for a normal non-debuggable public APK.  
-**Resolution:** The Android launcher now uses the Storage Access Framework to let the game owner select a compatible `res` folder containing `data` and `sound`. Files are copied into app-private storage through a staging directory and are only activated after the import completes successfully.  
-**Validation:** A signed, non-debuggable side-by-side `releaseQa` build was installed on the Retroid Pocket 5. The folder picker imported a temporary user-visible copy of the independently supplied game data, the importer reported PASS, the game launched and remained alive through the smoke-test interval, no fatal releaseQa logcat entry was detected, the baseline package remained unchanged, and the temporary package/test data were removed afterward.
+**Resolution:** The Android launcher uses the Storage Access Framework to let the game owner select a compatible `res` folder containing `data` and `sound`. Files are copied into app-private storage through a staging directory and are activated only after the import completes successfully.  
+**Validation:** A signed, non-debuggable side-by-side release-QA build was validated on the Retroid Pocket 5. The importer reported PASS, the game launched and remained alive through the smoke-test interval, the baseline package remained unchanged, and temporary QA data were removed afterward.
 
 ## REL-SS-005 - Public release signing identity
 
-**Status:** Fixed for v0.1.0-pre.3.  
-**Resolution:** A dedicated release keystore was provisioned outside the Git repository. Public version metadata is `versionCode 13` and `versionName 0.1.0-pre.3`; the public package is `com.rp5np.systemshock`; the release variant is non-debuggable.  
+**Status:** Fixed and promoted to a stable-release invariant.  
+**Resolution:** A dedicated release keystore is maintained outside the Git repository. The public package remains `com.rp5np.systemshock`.  
 **Release certificate SHA-256:** `7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409`.  
-**Operational requirement:** Preserve the private keystore and its credentials securely for future compatible upgrades. They must never be committed to Git or included in public artifacts.
+**v1.0 hardening:** `scripts/verify-apk.ps1` pins that public certificate digest for release variants, so a stable APK signed with a different key fails verification even when no environment override is provided.  
+**Operational requirement:** Preserve the private keystore and its credentials securely. They must never be committed to Git or included in public artifacts.
 
-## REL-SS-006 - Final v0.1.0-pre.3 RP5 hardware gate
+## REL-SS-006 - v0.1.0-pre.3 hardware/release gate
 
-**Status:** Passed.  
-**Validation:** Clean source checkout, pinned dependency bootstrap, JDK 17 QA build, semantic APK verification, side-by-side RP5 installation, game-data transfer/import validation, runtime smoke testing, manual gameplay approval, importer QA and baseline preservation all passed.  
-**Release consequence:** The importer changes were merged after successful CI and hardware validation. The final public release APK must be rebuilt and verified from the merged release commit before tagging and publication.
+**Status:** Passed and published historically.  
+**Validation:** Clean source checkout, pinned dependency bootstrap, JDK 17 QA build, semantic APK verification, side-by-side RP5 installation, game-data transfer/import validation, runtime smoke testing, manual gameplay approval, importer QA and baseline preservation passed for the pre-release line.  
+**Release consequence:** `v0.1.0-pre.3` became the first APK-bearing public pre-release and established the signing identity carried forward to v1.0.
+
+## REL-SS-007 - Stable v1.0 preservation scope and complete-playthrough acceptance
+
+**Status:** Product/manual gate passed; machine release gate in progress.  
+**Decision:** Stable v1.0 preserves the original game presentation/content and limits Android-specific changes to platform access and reliability.  
+**Manual validation:** The project owner reports a complete start-to-finish playthrough on the Retroid Pocket 5 and accepts the game as working correctly on the reference target.  
+**Release consequence:** Additional HD, Hor+, font-remaster, truecolor or gameplay-change work is not required before v1.0. See [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
 
 ## OPEN-SS-002 - Broad Android compatibility
 
-**Status:** Open.  
-**Impact:** The Retroid Pocket 5 is the reference device, but other Android devices may differ in controller mapping, OEM overlays, lifecycle behavior and aspect handling.  
-**Required resolution:** Build a device compatibility matrix from independent reports/tests.
+**Status:** Open / non-blocking for v1.0.  
+**Impact:** The Retroid Pocket 5 is the validated reference device, but other Android devices may differ in controller mapping, OEM overlays, lifecycle behavior and display handling.  
+**v1.0 rule:** Stable status applies to the documented RP5 reference boundary. Other Android 13+ ARM64 devices remain best-effort/unvalidated until compatibility reports exist.  
+**Required follow-up:** Build the device compatibility matrix from independent reports; do not claim universal Android compatibility.
 
-## OPEN-SS-003 - WORLD/STATIC HD path
+## SCOPE-SS-003 - WORLD/STATIC HD and truecolor path
 
-**Status:** Blocked by renderer architecture.  
-**Finding:** The current game renderer is indexed 8-bit software rendering. Bicubic WORLD/STATIC remasters generate colors that cannot be represented exactly in the original palette.  
-**Current rule:** Keep original resources authoritative. Do not ship a lossy WORLD/STATIC replacement without an explicit quality gate.  
-**Decision still required:** truecolor renderer path versus explicitly accepted indexed quantization.
+**Status:** Closed / out of scope for the preservation release.  
+**Historical finding:** Bicubic WORLD/STATIC remasters generate colors that cannot be represented exactly by the original indexed renderer without quantization or a different renderer.  
+**Final stable decision:** Keep original resources authoritative. No HD WORLD/STATIC or truecolor renderer work is required for v1.0.
 
-## OPEN-SS-004 - Font remaster
+## SCOPE-SS-004 - Font remaster
 
-**Status:** Research in progress.  
-**Evidence:** The validated offline dataset contains 36 fonts and 5,696 glyphs.  
-**Concern:** Font/resource IDs are not globally unique unless resource-file identity is part of the key.  
-**Current rule:** Review contour/vector candidates offline before runtime integration; do not re-use rejected experimental stages blindly.
+**Status:** Closed / out of scope for the preservation release.  
+**Historical evidence:** Offline research analysed 36 fonts and 5,696 glyphs and rejected several experimental stages.  
+**Final stable decision:** Stable v1.0 uses the original game fonts. Font reconstruction remains historical research only.

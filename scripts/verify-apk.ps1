@@ -9,6 +9,10 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $Root = Split-Path -Parent $PSScriptRoot
+$ExpectedVersionCode = '10000'
+$BaseVersionName = '1.0.0'
+$ExpectedApplicationLabel = 'System Shock - Android'
+$ExpectedReleaseSignerSha256 = '7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409'
 
 if (-not $AndroidSdk) {
     if ($env:ANDROID_SDK_ROOT) { $AndroidSdk = $env:ANDROID_SDK_ROOT }
@@ -24,7 +28,7 @@ $VariantInfo = switch ($Variant) {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\debug\app-debug.apk'
             Package = 'com.rp5np.systemshock'
-            VersionName = '0.1.0-pre.3'
+            VersionName = $BaseVersionName
             Debuggable = $true
             ReleaseSigned = $false
         }
@@ -33,7 +37,7 @@ $VariantInfo = switch ($Variant) {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\qa\app-qa.apk'
             Package = 'com.rp5np.systemshock.qa'
-            VersionName = '0.1.0-pre.3-qa'
+            VersionName = "$BaseVersionName-qa"
             Debuggable = $true
             ReleaseSigned = $false
         }
@@ -42,7 +46,7 @@ $VariantInfo = switch ($Variant) {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\releaseQa\app-releaseQa.apk'
             Package = 'com.rp5np.systemshock.releaseqa'
-            VersionName = '0.1.0-pre.3-releaseqa'
+            VersionName = "$BaseVersionName-releaseqa"
             Debuggable = $false
             ReleaseSigned = $true
         }
@@ -51,7 +55,7 @@ $VariantInfo = switch ($Variant) {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\release\app-release.apk'
             Package = 'com.rp5np.systemshock'
-            VersionName = '0.1.0-pre.3'
+            VersionName = $BaseVersionName
             Debuggable = $false
             ReleaseSigned = $true
         }
@@ -118,11 +122,18 @@ $ActualVersionName = $Matches.versionName
 if ($ActualPackage -ne $VariantInfo.Package) {
     throw "Package mismatch. Expected $($VariantInfo.Package), found $ActualPackage"
 }
-if ($ActualVersionCode -ne '13') {
-    throw "versionCode mismatch. Expected 13, found $ActualVersionCode"
+if ($ActualVersionCode -ne $ExpectedVersionCode) {
+    throw "versionCode mismatch. Expected $ExpectedVersionCode, found $ActualVersionCode"
 }
 if ($ActualVersionName -ne $VariantInfo.VersionName) {
     throw "versionName mismatch. Expected $($VariantInfo.VersionName), found $ActualVersionName"
+}
+if ($BadgingText -notmatch "application-label:'(?<label>[^']*)'") {
+    throw 'Unable to parse application label from APK.'
+}
+$ActualApplicationLabel = $Matches.label
+if ($ActualApplicationLabel -ne $ExpectedApplicationLabel) {
+    throw "Application label mismatch. Expected '$ExpectedApplicationLabel', found '$ActualApplicationLabel'"
 }
 if ($BadgingText -notmatch "sdkVersion:'33'") {
     throw 'minSdk mismatch. Expected 33.'
@@ -204,11 +215,15 @@ if ($VariantInfo.ReleaseSigned) {
     if ($SignerDn -match 'CN=Android Debug') {
         throw "$Variant APK is signed with the generic Android debug certificate."
     }
-    $ExpectedReleaseDigest = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
-    if (-not [string]::IsNullOrWhiteSpace($ExpectedReleaseDigest)) {
-        $NormalizedExpectedDigest = ($ExpectedReleaseDigest -replace '[^0-9a-fA-F]','').ToLowerInvariant()
+    if ($SignerDigest -ne $ExpectedReleaseSignerSha256) {
+        throw "Stable release signing certificate mismatch. Expected $ExpectedReleaseSignerSha256, found $SignerDigest"
+    }
+
+    $ExpectedReleaseDigestOverride = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
+    if (-not [string]::IsNullOrWhiteSpace($ExpectedReleaseDigestOverride)) {
+        $NormalizedExpectedDigest = ($ExpectedReleaseDigestOverride -replace '[^0-9a-fA-F]','').ToLowerInvariant()
         if ($SignerDigest -ne $NormalizedExpectedDigest) {
-            throw "Release signing certificate mismatch. Expected $NormalizedExpectedDigest, found $SignerDigest"
+            throw "Release signing certificate environment pin mismatch. Expected $NormalizedExpectedDigest, found $SignerDigest"
         }
     }
 }
@@ -218,6 +233,7 @@ Write-Host "VARIANT=$Variant"
 Write-Host "PACKAGE=$ActualPackage"
 Write-Host "VERSION_CODE=$ActualVersionCode"
 Write-Host "VERSION_NAME=$ActualVersionName"
+Write-Host "APPLICATION_LABEL=$ActualApplicationLabel"
 Write-Host "DEBUGGABLE=$IsDebuggable"
 Write-Host "DEBUGGABLE_SOURCE=$DebuggableSource"
 Write-Host "SIGNER_SHA256=$SignerDigest"

@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
-        android:label="System Shock RP5 P1.7"
+        android:label="System Shock - Android"
         android:icon="@mipmap/ic_launcher"
         android:allowBackup="false"
         android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
@@ -17,7 +17,7 @@
 
         <activity
             android:name="com.rp5np.systemshock.LauncherActivity"
-            android:label="System Shock RP5 P1.7"
+            android:label="System Shock - Android"
             android:screenOrientation="landscape"
             android:exported="true">
             <intent-filter>
@@ -30,7 +30,7 @@
 
         <activity
             android:name="com.rp5np.systemshock.ShockolateActivity"
-            android:label="System Shock RP5 P1.7"
+            android:label="System Shock - Android"
             android:showWhenLocked="true"
             android:turnScreenOn="true"
             android:screenOrientation="landscape"

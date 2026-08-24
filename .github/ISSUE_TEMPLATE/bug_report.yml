@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for testing System Shock Android. Please provide observed evidence and keep hypotheses separate from confirmed causes.
+        Thanks for testing System Shock - Android. Please provide observed evidence and keep hypotheses separate from confirmed causes. Stable development is preservation-first; reports about access, compatibility and regressions are especially useful.
 
   - type: dropdown
     id: version
@@ -13,7 +13,8 @@ body:
       label: Version or source
       description: Which public version did you test?
       options:
-        - v0.1.0-pre.2
+        - v1.0.0
+        - v0.1.0-pre.3
         - main
         - Other / not sure
     validations:
@@ -49,8 +50,8 @@ body:
       label: Steps to reproduce
       description: List the shortest reliable sequence that triggers the problem.
       placeholder: |
-        1. Clone ...
-        2. Run ...
+        1. Install or build ...
+        2. Launch ...
         3. Observe ...
     validations:
       required: true

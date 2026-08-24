@@ -1,39 +1,57 @@
 # Install and first run
 
-## Current QA path
+## Public-user path
 
-The preferred hardware-test path is the dedicated QA build. It uses the package ID `com.rp5np.systemshock.qa`, so it can coexist with an existing `com.rp5np.systemshock` installation on the same device.
-
-A one-click consumer APK with a graphical game-data importer is not published yet.
+The stable Android path is designed so a normal user does not need ADB, USB debugging, PowerShell or the Android SDK.
 
 ### Requirements
 
-- Android device with ARM64 support
-- USB debugging enabled
-- Android platform-tools available in the pinned Android SDK
-- A QA APK built and verified from this source tree
-- Your own compatible System Shock `res` directory containing `data` and `sound`
+- Android 13 or later on an ARM64 (`arm64-v8a`) device
+- the signed System Shock - Android APK
+- your own compatible System Shock `res` directory containing both `data` and `sound`
 
-### Build and verify QA
+The Retroid Pocket 5 is the validated reference device. Other Android 13+ ARM64 devices are not guaranteed until tested; see [`COMPATIBILITY.md`](COMPATIBILITY.md).
+
+## Install
+
+1. Download the signed APK from the GitHub release.
+2. Install it through Android's normal APK installation flow.
+3. Make your legally obtained compatible System Shock `res` folder available on the device.
+4. Launch **System Shock - Android**.
+5. Choose **Select res folder**.
+6. Select the `res` directory that contains `data` and `sound`.
+7. Approve folder access.
+
+The importer copies the selected data into the application's private storage. The game launches after the import completes successfully. Normal later launches go directly to the game while the imported data remains present.
+
+No commercial System Shock game data is included in the APK.
+
+## Import safety
+
+The importer uses a staging directory. Existing live game data is not replaced until the new import has completed successfully. If activation fails, the importer attempts to restore the previous data directory rather than promoting a partial copy.
+
+The public manifest does not request general Internet access or broad legacy storage permission for this process. Folder selection uses Android's Storage Access Framework.
+
+## Updating from an earlier release
+
+The stable release keeps the package ID `com.rp5np.systemshock` and the established release-signing identity. Its Android `versionCode` is greater than the public pre-release codes, allowing an in-place Android upgrade when the installed APK uses the same signing identity.
+
+Android normally preserves app-private storage during an in-place update. **Uninstalling the application is different:** Android may remove the application's private storage. Keep your legally obtained original `res` data available independently and do not treat the app-private imported copy as your archival master.
+
+## Developer / QA path
+
+The dedicated QA build remains available for development and device testing. It uses `com.rp5np.systemshock.qa`, so it can coexist with the normal installation.
+
+Build and verify it with:
 
 ```powershell
 pwsh -File .\scripts\qa-gate.ps1
 ```
 
-### Install QA + copy data + launch
+For developer-controlled ADB import into the QA package:
 
 ```powershell
 pwsh -File .\scripts\install-qa.ps1 -GameRes 'D:\Path\To\res'
 ```
 
-The QA installer verifies the APK before installation, targets only `com.rp5np.systemshock.qa`, and compares the normal `com.rp5np.systemshock` package path before and after installation. If the baseline path changes, the helper fails instead of continuing.
-
-If multiple ADB devices are connected, disconnect the devices that are not part of the test.
-
-## Debug path
-
-`scripts/install-debug.ps1` remains available for developer workflows that intentionally target `com.rp5np.systemshock`. It is not the preferred path when a functional baseline installation must be preserved.
-
-## Reference device
-
-The Retroid Pocket 5 is the primary hardware reference. The code is Android/ARM64, but that does not imply every Android device/controller/display combination has been validated. See `COMPATIBILITY.md`.
+The QA/ADB path is not required for normal public use.

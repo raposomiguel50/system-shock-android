@@ -5,14 +5,15 @@ body:
   - type: markdown
     attributes:
       value: |
-        Compatibility reports help build a device matrix beyond the Retroid Pocket 5 reference target. Successful reports are as useful as failures.
+        Compatibility reports help build a device matrix beyond the Retroid Pocket 5 reference target. Successful reports are as useful as failures. Stable v1.0 uses the 1024x768 4:3 preservation presentation.
 
   - type: dropdown
     id: version
     attributes:
       label: Tested version
       options:
-        - v0.1.0-pre.2
+        - v1.0.0
+        - v0.1.0-pre.3
         - main
         - Other
     validations:
@@ -41,21 +42,9 @@ body:
       description: State whether you used built-in controls, Bluetooth, USB or another controller.
 
   - type: dropdown
-    id: build
-    attributes:
-      label: Build result
-      options:
-        - Pass
-        - Fail
-        - Used a build supplied by another tester
-        - Not tested
-    validations:
-      required: true
-
-  - type: dropdown
     id: install
     attributes:
-      label: Install and launch
+      label: Install and first-run data import
       options:
         - Pass
         - Partial
@@ -68,13 +57,15 @@ body:
     id: runtime
     attributes:
       label: Runtime checks
-      description: Report display, controls, touchscreen, text input and audio separately where possible.
+      description: Report the stable 4:3 presentation, controls, touchscreen, text input, audio and save/load separately where possible.
       placeholder: |
-        Display: Pass / Fail / Not tested
-        Controls: Pass / Fail / Not tested
+        Menu/gameplay: Pass / Fail / Not tested
+        1024x768 4:3 display: Pass / Fail / Not tested
+        Controls/fine cursor: Pass / Fail / Not tested
         Touchscreen: Pass / Fail / Not tested
         Text input: Pass / Fail / Not tested
         Audio: Pass / Fail / Not tested
+        Save/load: Pass / Fail / Not tested
     validations:
       required: true
 
@@ -82,7 +73,7 @@ body:
     id: notes
     attributes:
       label: Notes and evidence
-      description: Add relevant logs, screenshots, hashes or device-specific observations. Do not attach proprietary game data.
+      description: Add relevant logs, screenshots, APK hashes or device-specific observations. Do not attach proprietary game data.
 
   - type: checkboxes
     id: checks

@@ -21,8 +21,8 @@ android {
         applicationId "com.rp5np.systemshock"
         minSdkVersion 33
         targetSdkVersion 33
-        versionCode 13
-        versionName "0.1.0-pre.3"
+        versionCode 10000
+        versionName "1.0.0"
 
         externalNativeBuild {
             cmake {

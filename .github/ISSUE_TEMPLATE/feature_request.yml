@@ -1,17 +1,17 @@
-name: Feature or improvement suggestion
-description: Suggest a change that could improve the port, build process or documentation.
+name: Preservation / access improvement suggestion
+description: Suggest a change that improves Android access, compatibility, reliability, build/release quality or documentation without remastering the original game.
 title: "[Suggestion] "
 body:
   - type: markdown
     attributes:
       value: |
-        Suggestions are welcome. Explain the problem or opportunity first, then the proposed change.
+        System Shock - Android is preservation-first. Stable releases keep the original game content and 4:3 presentation authoritative. Widescreen/Hor+, HD replacement assets, remastered fonts, gameplay changes and new content are outside the stable project scope.
 
   - type: textarea
     id: need
     attributes:
-      label: Problem or opportunity
-      description: What would this improve, simplify or make possible?
+      label: Problem or access opportunity
+      description: What Android access, compatibility, reliability or documentation problem would this solve?
     validations:
       required: true
 
@@ -28,23 +28,23 @@ body:
     attributes:
       label: Area
       options:
-        - Controls / input
-        - Display / widescreen
-        - Audio
+        - Controls / input adaptation
+        - Audio / timing compatibility
         - Android lifecycle / platform
-        - Build / reproducibility
+        - Device compatibility
+        - Build / reproducibility / release
         - Game-data import
-        - Graphics / fonts
+        - Installation / accessibility
         - Documentation
-        - Other
+        - Other preservation / access
     validations:
       required: true
 
   - type: textarea
     id: tradeoffs
     attributes:
-      label: Tradeoffs or compatibility concerns
-      description: Note any risks to 4:3 fallback, legacy behavior, other Android devices or reproducibility.
+      label: Fidelity or compatibility risks
+      description: Explain any risk to original behavior, 4:3 presentation, data compatibility, existing installations or reproducibility.
 
   - type: textarea
     id: references
@@ -58,4 +58,6 @@ body:
       label: Project boundaries
       options:
         - label: This suggestion does not require redistributing proprietary System Shock game data.
+          required: true
+        - label: This suggestion is intended to preserve or improve access to the original game rather than remaster or redesign it.
           required: true

@@ -1,6 +1,6 @@
 # Open knowledge base
 
-This knowledge base is structured like an operational engineering record: **context -> symptom -> impact -> root cause -> resolution/decision -> validation -> reusable lesson**. Open concerns are kept visible instead of being rewritten out of the project history.
+This knowledge base is structured like an operational engineering record: **context -> symptom -> impact -> root cause -> resolution/decision -> validation -> reusable lesson**. Historical research remains visible even when it is outside the stable preservation scope.
 
 ## KB-SS-001 - PowerShell variable case collision
 
@@ -40,7 +40,7 @@ This knowledge base is structured like an operational engineering record: **cont
 ## KB-SS-005 - Right stick must serve two interaction models
 
 **Status:** Resolved / validated on RP5  
-**Problem:** System Shock needs both modern camera-look behavior and precise access to a mouse-oriented interface.  
+**Problem:** System Shock needs both camera-look behavior and precise access to a mouse-oriented interface.  
 **Resolution:** Right stick controls camera look by default. View/Select toggles into fine cursor mode and back again. Touch remains an optional pointer path.  
 **Reusable lesson:** Preserve distinct interaction modes instead of forcing a single abstraction across gameplay and legacy UI.
 
@@ -52,20 +52,21 @@ This knowledge base is structured like an operational engineering record: **cont
 **Resolution:** Use SDL's monotonic high-resolution performance counter; after abnormal lateness, shift all active layer origins together rather than bursting overdue events.  
 **Reusable lesson:** Real-time media clocks should preserve intervals after stalls, not replay lateness at maximum speed.
 
-## KB-SS-007 - 4:3 presentation retained as the current baseline
+## KB-SS-007 - 4:3 presentation retained as the stable baseline
 
-**Status:** Decision / current baseline  
+**Status:** Final stable decision  
 **Context:** A 16:9 expansion prototype was evaluated during development.  
-**Decision:** The current port does not expose a switchable widescreen mode. It retains the original-style 1024x768 4:3 no-stretch presentation as the only public presentation mode.  
+**Decision:** The stable port does not expose a switchable widescreen mode. It retains the original-style 1024x768 4:3 no-stretch presentation as the public presentation mode.  
 **Visual boundary:** The Android IME keyboard shown during text entry is the only platform-specific visual addition to the original game presentation.  
-**Reusable lesson:** A technically workable presentation experiment does not need to become a shipped feature when visual consistency and fidelity are better served by the reference format.
+**Reusable lesson:** A technically workable presentation experiment does not need to become a shipped feature when fidelity is better served by the reference format.
 
 ## KB-SS-008 - HD assets versus an indexed 8-bit renderer
 
-**Status:** Partially resolved; WORLD/STATIC remains open  
+**Status:** Research closed for the stable preservation line  
 **Finding:** Sprite/UI Scale4x can remain exact because it selects source palette colors. Bicubic WORLD/STATIC output creates new RGB colors that require lossy quantization in the current renderer.  
-**Decision:** Permit reversible indexed sprite/UI research; keep WORLD/STATIC original until a truecolor-versus-quantized path passes an explicit quality gate.  
-**Reusable lesson:** Choose remaster algorithms against the runtime color model, not only against offline screenshots.
+**Historical decision:** Experimental HD paths were evaluated but not promoted.  
+**Stable decision:** Original graphics remain authoritative; HD WORLD/STATIC, truecolor rendering and replacement graphics are out of scope for v1.0.  
+**Reusable lesson:** Choose remaster algorithms against the runtime color model, and do not let optional research become a blocker for a preservation release.
 
 ## KB-SS-009 - Resource identity collisions
 
@@ -90,6 +91,15 @@ This knowledge base is structured like an operational engineering record: **cont
 **Resolution:** Keep `--no-tags` for controlled cloning, but test whether the requested ref resolves locally and explicitly fetch `refs/tags/<tag>` when required. Pin SDL_mixer `release-2.8.1` to commit `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
 **Validation:** A targeted rerun passed first. A completely new `v0.1.0-pre.2` clone was then created in a new path with no pre-existing `.deps` directory. The helper downloaded both dependencies from scratch and completed with `FRESH_PRE2_BOOTSTRAP=PASS`, SDL at `5d249570393f7a37e037abf22cd6012a4cc56a71` and SDL_mixer at `171eb2d420d5643e4ee11514a06e04a41a463bbd`.  
 **Reusable lesson:** Dependency pinning must verify object availability, not merely name a tag. A clean clone is the test that exposes hidden dependence on local Git metadata.
+
+## KB-SS-012 - A preservation release needs a product boundary
+
+**Status:** Standard / v1.0 decision  
+**Context:** Development generated valid research branches for Hor+, HD resources and font reconstruction after the core Android port was already playable.  
+**Risk:** Treating every experiment as required work would prevent a stable release even though the project's actual goal is preservation and practical Android access.  
+**Decision:** Stable v1.0 freezes the original-style 4:3 presentation and original content. Android-specific work is limited to platform access, input, text, audio, data import, compatibility and release reliability.  
+**Validation:** The project owner reports a complete start-to-finish RP5 playthrough and accepts the resulting game behavior.  
+**Reusable lesson:** Define stable completion against the project's purpose, not against every technically possible enhancement.
 
 ## Template for future entries
 
