@@ -13,10 +13,14 @@ $Root = Split-Path -Parent $PSScriptRoot
 $Git = (Get-Command git -ErrorAction Stop).Source
 $ExpectedVersion = '1.0.0'
 $ExpectedVersionCode = 10000
-$ExpectedPackage = 'com.rp5np.systemshock'
+$ExpectedPackage = 'io.github.raposomiguel50.systemshock'
 $ExpectedAbi = 'arm64-v8a'
 $ExpectedLabel = 'System Shock - Android'
-$ExpectedSigner = '7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409'
+$ExpectedSigner = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
+if ([string]::IsNullOrWhiteSpace($ExpectedSigner)) {
+    throw 'RP5NP_RELEASE_CERT_SHA256 must be set for the stable v1 final gate.'
+}
+$ExpectedSigner = ($ExpectedSigner -replace '[^0-9a-fA-F]','').ToLowerInvariant()
 
 $Head = (& $Git -C $Root rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($Head)) {

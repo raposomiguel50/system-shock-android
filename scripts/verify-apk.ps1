@@ -12,7 +12,7 @@ $Root = Split-Path -Parent $PSScriptRoot
 $ExpectedVersionCode = '10000'
 $BaseVersionName = '1.0.0'
 $ExpectedApplicationLabel = 'System Shock - Android'
-$ExpectedReleaseSignerSha256 = '7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409'
+$StablePackage = 'io.github.raposomiguel50.systemshock'
 
 if (-not $AndroidSdk) {
     if ($env:ANDROID_SDK_ROOT) { $AndroidSdk = $env:ANDROID_SDK_ROOT }
@@ -27,7 +27,7 @@ $VariantInfo = switch ($Variant) {
     'debug' {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\debug\app-debug.apk'
-            Package = 'com.rp5np.systemshock'
+            Package = $StablePackage
             VersionName = $BaseVersionName
             Debuggable = $true
             ReleaseSigned = $false
@@ -36,7 +36,7 @@ $VariantInfo = switch ($Variant) {
     'qa' {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\qa\app-qa.apk'
-            Package = 'com.rp5np.systemshock.qa'
+            Package = "$StablePackage.qa"
             VersionName = "$BaseVersionName-qa"
             Debuggable = $true
             ReleaseSigned = $false
@@ -45,7 +45,7 @@ $VariantInfo = switch ($Variant) {
     'releaseQa' {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\releaseQa\app-releaseQa.apk'
-            Package = 'com.rp5np.systemshock.releaseqa'
+            Package = "$StablePackage.releaseqa"
             VersionName = "$BaseVersionName-releaseqa"
             Debuggable = $false
             ReleaseSigned = $true
@@ -54,7 +54,7 @@ $VariantInfo = switch ($Variant) {
     'release' {
         [pscustomobject]@{
             Apk = 'AndroidProject\app\build\outputs\apk\release\app-release.apk'
-            Package = 'com.rp5np.systemshock'
+            Package = $StablePackage
             VersionName = $BaseVersionName
             Debuggable = $false
             ReleaseSigned = $true
@@ -215,16 +215,14 @@ if ($VariantInfo.ReleaseSigned) {
     if ($SignerDn -match 'CN=Android Debug') {
         throw "$Variant APK is signed with the generic Android debug certificate."
     }
-    if ($SignerDigest -ne $ExpectedReleaseSignerSha256) {
-        throw "Stable release signing certificate mismatch. Expected $ExpectedReleaseSignerSha256, found $SignerDigest"
-    }
 
-    $ExpectedReleaseDigestOverride = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
-    if (-not [string]::IsNullOrWhiteSpace($ExpectedReleaseDigestOverride)) {
-        $NormalizedExpectedDigest = ($ExpectedReleaseDigestOverride -replace '[^0-9a-fA-F]','').ToLowerInvariant()
-        if ($SignerDigest -ne $NormalizedExpectedDigest) {
-            throw "Release signing certificate environment pin mismatch. Expected $NormalizedExpectedDigest, found $SignerDigest"
-        }
+    $ExpectedReleaseDigest = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
+    if ([string]::IsNullOrWhiteSpace($ExpectedReleaseDigest)) {
+        throw 'RP5NP_RELEASE_CERT_SHA256 must pin the stable release certificate for release verification.'
+    }
+    $NormalizedExpectedDigest = ($ExpectedReleaseDigest -replace '[^0-9a-fA-F]','').ToLowerInvariant()
+    if ($SignerDigest -ne $NormalizedExpectedDigest) {
+        throw "Stable release signing certificate mismatch. Expected $NormalizedExpectedDigest, found $SignerDigest"
     }
 }
 

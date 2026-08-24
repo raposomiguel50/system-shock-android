@@ -26,15 +26,18 @@ This public source tree contains redistributable code and Android project files 
 - First-run Android game-data importer: **validated on Retroid Pocket 5**
 - Stable presentation: **1024x768 4:3 only, no non-uniform stretch**
 - Architecture: **Android / ARM64 (`arm64-v8a`)**
-- Android package: **`com.rp5np.systemshock`**
+- Stable Android package: **`io.github.raposomiguel50.systemshock`**
+- Historical pre-release package: **`com.rp5np.systemshock`**
 - Application label: **System Shock - Android**
-- Stable signing certificate SHA-256: **`7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409`**
+- Stable signing identity: **created automatically at the first final v1.0 build, then preserved for all future stable updates**
 - Upstream Shockolate baseline: [`4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690`](https://github.com/Interrupt/systemshock/commit/4cc3d07dfff2d11b6d3a0a9960a51cf4ca253690)
 - SDL baseline: **2.32.10**, commit [`5d249570393f7a37e037abf22cd6012a4cc56a71`](https://github.com/libsdl-org/SDL/commit/5d249570393f7a37e037abf22cd6012a4cc56a71)
 - SDL_mixer: **2.8.1**, commit [`171eb2d420d5643e4ee11514a06e04a41a463bbd`](https://github.com/libsdl-org/SDL_mixer/commit/171eb2d420d5643e4ee11514a06e04a41a463bbd)
 - Proprietary game data included: **No**
 
-The source metadata has been moved to `1.0.0`, but stable `v1.0.0` is **not considered published until the exact source commit passes the final signed-release machine gates and the verified APK is attached to a matching GitHub release**.
+The stable package is intentionally separate from the historical pre-release package. This lets `v1.0.0` establish a clean long-lived signing identity without depending on the old pre-release keystore, and allows both packages to coexist during transition.
+
+Stable `v1.0.0` is **not considered published until the exact source commit passes the final signed-release machine gates and the verified APK is attached to a matching GitHub release**.
 
 ## Preservation definition
 
@@ -64,7 +67,7 @@ Android-specific adaptations are limited to what is needed for practical access 
 - SDL_mixer/ADLMIDI audio path with host-stall-resistant gameplay music timing.
 - First-run Android Storage Access Framework importer for a legally obtained System Shock `res` folder containing `data` and `sound`.
 - Import staging and rollback so an incomplete copy is not activated as live game data.
-- Signed non-debuggable release path with a pinned stable signing identity.
+- Signed non-debuggable release path with an explicit stable signing identity.
 - Machine verification for package ID, version, label, ABI, native libraries, proprietary-data absence, debuggable state and signing certificate.
 
 The Android IME keyboard shown during text entry is a platform interface rather than a replacement game asset.
@@ -93,8 +96,9 @@ Other Android 13+ ARM64 devices may work, but are not presented as validated unt
 1. Read [`docs/BUILD.md`](docs/BUILD.md).
 2. Run `scripts/bootstrap-deps.ps1` to obtain the pinned public dependencies.
 3. Run `scripts/qa-gate.ps1` for the isolated QA build and verifier.
-4. For the stable signed build, configure the release-signing variables described in [`docs/RELEASE.md`](docs/RELEASE.md) and run `scripts/release-gate.ps1`.
-5. Read [`docs/GAME_DATA.md`](docs/GAME_DATA.md) for the commercial-data boundary and importer behavior.
+4. For an independently signed build, configure the release-signing variables described in [`docs/RELEASE.md`](docs/RELEASE.md) and run `scripts/release-gate.ps1`.
+5. The official v1.0 APK is produced by the project one-click release workflow, which creates/reuses the private stable signing identity automatically and records its certificate digest in release evidence.
+6. Read [`docs/GAME_DATA.md`](docs/GAME_DATA.md) for the commercial-data boundary and importer behavior.
 
 The release APK and source tree do not redistribute System Shock commercial game data.
 

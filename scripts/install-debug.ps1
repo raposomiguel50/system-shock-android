@@ -16,8 +16,8 @@ $State = (& $Adb get-state 2>&1 | Out-String).Trim()
 if ($State -ne 'device') { throw "ADB device not ready: $State" }
 & $Adb install -r $Apk
 if ($LASTEXITCODE -ne 0) { throw "adb install failed: $LASTEXITCODE" }
-$Pkg='com.rp5np.systemshock'
-$Tmp='/data/local/tmp/rp5np-systemshock-res'
+$Pkg='io.github.raposomiguel50.systemshock'
+$Tmp='/data/local/tmp/systemshock-android-res'
 & $Adb shell am force-stop $Pkg | Out-Null
 & $Adb shell rm -rf $Tmp | Out-Null
 & $Adb shell mkdir -p $Tmp | Out-Null
@@ -35,6 +35,6 @@ if ($LASTEXITCODE -ne 0) { throw 'Failed to copy res/data into app-private stora
 & $Adb shell run-as $Pkg cp -R "$Tmp/sound" files/res/sound
 if ($LASTEXITCODE -ne 0) { throw 'Failed to copy res/sound into app-private storage' }
 & $Adb shell rm -rf $Tmp | Out-Null
-& $Adb shell am start -n "$Pkg/.ShockolateActivity"
+& $Adb shell am start -n "$Pkg/com.rp5np.systemshock.ShockolateActivity"
 if ($LASTEXITCODE -ne 0) { throw 'Application launch failed' }
 Write-Host 'INSTALL_DEBUG_AND_DATA=PASS'

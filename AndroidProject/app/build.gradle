@@ -18,7 +18,9 @@ android {
     ndkVersion "29.0.14206865"
 
     defaultConfig {
-        applicationId "com.rp5np.systemshock"
+        // Stable v1 starts a clean Android application identity so it can coexist
+        // with the historical pre-release package com.rp5np.systemshock.
+        applicationId "io.github.raposomiguel50.systemshock"
         minSdkVersion 33
         targetSdkVersion 33
         versionCode 10000

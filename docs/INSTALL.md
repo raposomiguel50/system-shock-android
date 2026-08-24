@@ -32,15 +32,19 @@ The importer uses a staging directory. Existing live game data is not replaced u
 
 The public manifest does not request general Internet access or broad legacy storage permission for this process. Folder selection uses Android's Storage Access Framework.
 
-## Updating from an earlier release
+## Stable v1 versus historical pre-release
 
-The stable release keeps the package ID `com.rp5np.systemshock` and the established release-signing identity. Its Android `versionCode` is greater than the public pre-release codes, allowing an in-place Android upgrade when the installed APK uses the same signing identity.
+Stable v1 uses package ID `io.github.raposomiguel50.systemshock`.
 
-Android normally preserves app-private storage during an in-place update. **Uninstalling the application is different:** Android may remove the application's private storage. Keep your legally obtained original `res` data available independently and do not treat the app-private imported copy as your archival master.
+The historical public pre-release used `com.rp5np.systemshock`. Because these package IDs differ, Android treats them as separate applications and they may coexist. Stable v1 therefore does not require or depend on the historical pre-release signing key.
+
+If both are installed, each has its own app-private storage. Import your legal `res` folder into the stable app on its first launch. Once the stable line is established, future stable releases reuse the same package and signing identity so normal in-place upgrades remain possible within the stable line.
+
+Uninstalling an application may remove that application's private storage. Keep your legally obtained original `res` data available independently and do not treat the app-private imported copy as your archival master.
 
 ## Developer / QA path
 
-The dedicated QA build remains available for development and device testing. It uses `com.rp5np.systemshock.qa`, so it can coexist with the normal installation.
+The dedicated QA build uses `io.github.raposomiguel50.systemshock.qa`, so it can coexist with both the stable installation and the historical pre-release.
 
 Build and verify it with:
 

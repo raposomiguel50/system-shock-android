@@ -32,98 +32,67 @@ This creates the ignored `.deps/` directory and checks out:
 
 ## 2. Preflight
 
-The build scripts run `scripts/preflight.ps1` automatically. It verifies:
-
-- JDK 17
-- the pinned Android SDK, Build Tools, NDK and CMake versions
-- the exact dependency commits
-- a clean tracked Git working tree
-- release signing configuration when the release variant is requested
-
-It can also be run directly:
-
-```powershell
-pwsh -File .\scripts\preflight.ps1 -Variant qa
-```
+The build scripts run `scripts/preflight.ps1` automatically. It verifies JDK 17, the pinned Android toolchain, exact dependency commits, a clean tracked Git working tree, and release-signing configuration when required.
 
 ## 3. Build variants
 
 ### Debug
 
-For normal developer work:
-
 ```powershell
 pwsh -File .\scripts\build.ps1 -Variant debug
 ```
 
-Package: `com.rp5np.systemshock`
+Package: `io.github.raposomiguel50.systemshock`
 
 ### QA
-
-For real-device testing without touching an existing baseline installation:
 
 ```powershell
 pwsh -File .\scripts\build.ps1 -Variant qa
 ```
 
-Package: `com.rp5np.systemshock.qa`
+Package: `io.github.raposomiguel50.systemshock.qa`
 
-The QA build type is initialized from the debug build type, uses the generic debug signing key and has its own application ID. It can coexist with `com.rp5np.systemshock` on the same device.
+The QA build uses the generic debug key and can coexist with both the stable package and the historical pre-release package `com.rp5np.systemshock`.
 
 ### Release
 
-The release variant is non-debuggable and requires an explicit release signing configuration. See `docs/RELEASE.md`.
+The release variant is non-debuggable and requires explicit release-signing configuration. See `docs/RELEASE.md`.
 
 ```powershell
 pwsh -File .\scripts\build.ps1 -Variant release
 ```
 
-The build refuses to enter the release path unless the required release-signing environment variables are present and the keystore exists.
-
 ## 4. Verify the APK
-
-Always verify the exact variant that was built:
 
 ```powershell
 pwsh -File .\scripts\verify-apk.ps1 -Variant qa
 ```
 
-The verifier checks:
+The verifier checks expected package ID, version, label, SDK levels, ARM64-only native code, required native libraries, obvious proprietary-data absence, debuggable state and APK signature semantics.
 
-- expected package ID
-- version code and version name
-- minimum and target SDK
-- ARM64-only native code
-- required native libraries
-- absence of obvious commercial System Shock data
-- compiled launcher icon
-- expected debuggable state
-- APK signature validity
-- rejection of the generic Android debug certificate for release builds
+For `release`/`releaseQa`, `RP5NP_RELEASE_CERT_SHA256` is mandatory and pins the exact stable signing identity expected for that build.
 
 ## 5. Side-by-side hardware QA
 
-When a Retroid Pocket 5 or another Android test device is connected and authorized through ADB, the QA installer can load independently obtained game data into the QA package:
+When a test device is connected and authorized through ADB, the QA installer can load independently obtained game data into the QA package:
 
 ```powershell
 pwsh -File .\scripts\install-qa.ps1 -GameRes 'C:\path\to\owned\res'
 ```
 
-The helper verifies the QA APK before installation, targets only `com.rp5np.systemshock.qa`, and checks that the normal `com.rp5np.systemshock` package path is unchanged before and after QA installation.
+The helper verifies the QA APK and checks that neither the stable package nor the historical pre-release package is changed by QA installation.
 
 ## Fresh-clone reproducibility gate
 
-A release candidate must pass the following sequence from a new clone created directly at its final test path:
+A release candidate must pass:
 
 1. PowerShell static validation.
 2. Dependency bootstrap.
 3. Preflight.
 4. QA build.
 5. APK verification.
-6. Side-by-side installation on real hardware.
-7. Import of independently obtained game data into the QA package.
-8. Runtime validation of display, controls, text input, audio and gameplay.
-9. Signed release build from the accepted source commit.
-10. Release APK verification and hash recording.
+6. Side-by-side hardware validation when hardware testing is required.
+7. Signed release build from the accepted source commit.
+8. Release APK verification and hash recording.
 
-The `.cxx` and Gradle build directories are treated as path-bound disposable build state. A configured working tree must not be moved and reused as if those caches were portable.
+The `.cxx` and Gradle build directories are path-bound disposable build state and should not be treated as portable.

@@ -9,8 +9,9 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $Root = Split-Path -Parent $PSScriptRoot
-$QaPackage = 'com.rp5np.systemshock.qa'
-$BaselinePackage = 'com.rp5np.systemshock'
+$QaPackage = 'io.github.raposomiguel50.systemshock.qa'
+$StablePackage = 'io.github.raposomiguel50.systemshock'
+$LegacyPreReleasePackage = 'com.rp5np.systemshock'
 
 if (-not $AndroidSdk) {
     if ($env:ANDROID_SDK_ROOT) { $AndroidSdk = $env:ANDROID_SDK_ROOT }
@@ -45,62 +46,52 @@ if ($DeviceState -ne 'device') {
     throw "ADB device not ready: $DeviceState"
 }
 
-$BaselinePathBefore = @(& $Adb shell pm path $BaselinePackage 2>$null | ForEach-Object { $_.ToString().Trim() })
+$StablePathBefore = @(& $Adb shell pm path $StablePackage 2>$null | ForEach-Object { $_.ToString().Trim() })
+$LegacyPathBefore = @(& $Adb shell pm path $LegacyPreReleasePackage 2>$null | ForEach-Object { $_.ToString().Trim() })
 
 & $Adb install -r $Apk
 if ($LASTEXITCODE -ne 0) {
     throw "QA APK install failed: $LASTEXITCODE"
 }
 
-$TempDataRoot = '/data/local/tmp/rp5np-systemshock-qa-res'
+$TempDataRoot = '/data/local/tmp/systemshock-android-qa-res'
 & $Adb shell am force-stop $QaPackage | Out-Null
 & $Adb shell rm -rf $TempDataRoot | Out-Null
 & $Adb shell mkdir -p $TempDataRoot | Out-Null
 
 & $Adb push $Data "$TempDataRoot/data"
-if ($LASTEXITCODE -ne 0) {
-    throw 'adb push data failed.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'adb push data failed.' }
 & $Adb push $Sound "$TempDataRoot/sound"
-if ($LASTEXITCODE -ne 0) {
-    throw 'adb push sound failed.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'adb push sound failed.' }
 & $Adb shell chmod -R a+rX $TempDataRoot | Out-Null
 
 & $Adb shell run-as $QaPackage rm -rf files/res
-if ($LASTEXITCODE -ne 0) {
-    throw 'run-as unavailable for QA package.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'run-as unavailable for QA package.' }
 & $Adb shell run-as $QaPackage mkdir -p files/res
-if ($LASTEXITCODE -ne 0) {
-    throw 'Failed to create QA app-private res directory.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'Failed to create QA app-private res directory.' }
 & $Adb shell run-as $QaPackage cp -R "$TempDataRoot/data" files/res/data
-if ($LASTEXITCODE -ne 0) {
-    throw 'Failed to copy res/data into QA app-private storage.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'Failed to copy res/data into QA app-private storage.' }
 & $Adb shell run-as $QaPackage cp -R "$TempDataRoot/sound" files/res/sound
-if ($LASTEXITCODE -ne 0) {
-    throw 'Failed to copy res/sound into QA app-private storage.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'Failed to copy res/sound into QA app-private storage.' }
 & $Adb shell rm -rf $TempDataRoot | Out-Null
 
-$BaselinePathAfter = @(& $Adb shell pm path $BaselinePackage 2>$null | ForEach-Object { $_.ToString().Trim() })
-if (($BaselinePathBefore -join "`n") -ne ($BaselinePathAfter -join "`n")) {
-    throw 'Installed baseline package changed during QA installation. Stop testing and inspect the device.'
+$StablePathAfter = @(& $Adb shell pm path $StablePackage 2>$null | ForEach-Object { $_.ToString().Trim() })
+$LegacyPathAfter = @(& $Adb shell pm path $LegacyPreReleasePackage 2>$null | ForEach-Object { $_.ToString().Trim() })
+if (($StablePathBefore -join "`n") -ne ($StablePathAfter -join "`n")) {
+    throw 'Installed stable package changed during QA installation.'
+}
+if (($LegacyPathBefore -join "`n") -ne ($LegacyPathAfter -join "`n")) {
+    throw 'Historical pre-release package changed during QA installation.'
 }
 
 $QaPath = @(& $Adb shell pm path $QaPackage 2>$null | ForEach-Object { $_.ToString().Trim() })
-if ($QaPath.Count -lt 1) {
-    throw 'QA package was not found after installation.'
-}
+if ($QaPath.Count -lt 1) { throw 'QA package was not found after installation.' }
 
 & $Adb shell am start -n "$QaPackage/com.rp5np.systemshock.ShockolateActivity"
-if ($LASTEXITCODE -ne 0) {
-    throw 'QA application launch failed.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'QA application launch failed.' }
 
 Write-Host 'INSTALL_QA_AND_DATA=PASS'
 Write-Host "QA_PACKAGE=$QaPackage"
-Write-Host "BASELINE_PACKAGE=$BaselinePackage"
-Write-Host 'BASELINE_PRESERVED=PASS'
+Write-Host "STABLE_PACKAGE=$StablePackage"
+Write-Host "LEGACY_PRERELEASE_PACKAGE=$LegacyPreReleasePackage"
+Write-Host 'EXISTING_PACKAGES_PRESERVED=PASS'

@@ -15,7 +15,11 @@ The v1.0 line is defined by these rules:
 - Do not replace original graphics, fonts, music, sound effects, maps, story content or gameplay data.
 - Do not add widescreen/Hor+, HD assets, truecolor rendering, font remasters, gameplay rebalance or new content to the stable release.
 - Do not bundle commercial System Shock game data. The user supplies compatible data from a legally obtained copy.
-- Keep the package identity `com.rp5np.systemshock` and the established release-signing identity so existing installations can be upgraded rather than replaced.
+- Use the stable Android package `io.github.raposomiguel50.systemshock`.
+- Treat the historical pre-release package `com.rp5np.systemshock` as a separate development line. The stable package can coexist with it rather than depending on its signing key.
+- Generate and preserve one dedicated signing identity for the stable v1 line and all compatible future stable updates.
+
+The clean package/signing boundary is intentional: the first stable release must not depend on recovering the historical pre-release keystore.
 
 ## Android adaptations that are in scope
 

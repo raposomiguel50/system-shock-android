@@ -14,7 +14,12 @@ $Git = (Get-Command git -ErrorAction Stop).Source
 $ReleaseVersion = '1.0.0'
 $ReleaseTag = "v$ReleaseVersion"
 $ReleaseVersionCode = 10000
-$ReleaseSignerSha256 = '7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409'
+$ReleasePackage = 'io.github.raposomiguel50.systemshock'
+$ReleaseSignerSha256 = [Environment]::GetEnvironmentVariable('RP5NP_RELEASE_CERT_SHA256')
+if ([string]::IsNullOrWhiteSpace($ReleaseSignerSha256)) {
+    throw 'RP5NP_RELEASE_CERT_SHA256 must be set for the stable release build.'
+}
+$ReleaseSignerSha256 = ($ReleaseSignerSha256 -replace '[^0-9a-fA-F]','').ToLowerInvariant()
 
 & (Join-Path $PSScriptRoot 'lint-powershell.ps1')
 & (Join-Path $PSScriptRoot 'preflight.ps1') -Variant release -AndroidSdk $AndroidSdk -JavaHome $JavaHome -DepsRoot $DepsRoot
@@ -37,7 +42,7 @@ if ($LASTEXITCODE -ne 0) {
 $Manifest = [ordered]@{
     release = $ReleaseTag
     commit = $Commit
-    package = 'com.rp5np.systemshock'
+    package = $ReleasePackage
     versionCode = $ReleaseVersionCode
     versionName = $ReleaseVersion
     abi = 'arm64-v8a'

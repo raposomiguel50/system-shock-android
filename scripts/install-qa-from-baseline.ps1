@@ -8,8 +8,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $Root = Split-Path -Parent $PSScriptRoot
-$QaPackage = 'com.rp5np.systemshock.qa'
-$BaselinePackage = 'com.rp5np.systemshock'
+$QaPackage = 'io.github.raposomiguel50.systemshock.qa'
+$LegacyBaselinePackage = 'com.rp5np.systemshock'
 
 if (-not $AndroidSdk) {
     if ($env:ANDROID_SDK_ROOT) { $AndroidSdk = $env:ANDROID_SDK_ROOT }
@@ -35,9 +35,7 @@ if (-not (Test-Path -LiteralPath $Adb -PathType Leaf)) {
 }
 
 $DeviceState = (& $Adb get-state 2>&1 | Out-String).Trim()
-if ($DeviceState -ne 'device') {
-    throw "ADB device not ready: $DeviceState"
-}
+if ($DeviceState -ne 'device') { throw "ADB device not ready: $DeviceState" }
 
 function Get-PackagePath {
     param([Parameter(Mandatory=$true)][string]$PackageName)
@@ -53,19 +51,13 @@ function Assert-RunAs {
 }
 
 function Test-PrivateDirectory {
-    param(
-        [Parameter(Mandatory=$true)][string]$PackageName,
-        [Parameter(Mandatory=$true)][string]$Directory
-    )
+    param([string]$PackageName,[string]$Directory)
     & $Adb shell run-as $PackageName test -d $Directory | Out-Null
     return ($LASTEXITCODE -eq 0)
 }
 
 function Get-PrivateFileList {
-    param(
-        [Parameter(Mandatory=$true)][string]$PackageName,
-        [Parameter(Mandatory=$true)][string]$Directory
-    )
+    param([string]$PackageName,[string]$Directory)
     $RemoteCommand = "run-as $PackageName /system/bin/toybox find $Directory -type f"
     $Lines = @(& $Adb shell $RemoteCommand 2>&1 | ForEach-Object { $_.ToString().Trim() } | Where-Object { $_ } | Sort-Object)
     if ($LASTEXITCODE -ne 0) {
@@ -74,18 +66,17 @@ function Get-PrivateFileList {
     return $Lines
 }
 
-$BaselinePathBefore = @(Get-PackagePath -PackageName $BaselinePackage)
+$BaselinePathBefore = @(Get-PackagePath -PackageName $LegacyBaselinePackage)
 if ($BaselinePathBefore.Count -lt 1) {
-    throw "Baseline package is not installed: $BaselinePackage"
+    throw "Historical baseline package is not installed: $LegacyBaselinePackage"
 }
 
-Assert-RunAs -PackageName $BaselinePackage
-
-if (-not (Test-PrivateDirectory -PackageName $BaselinePackage -Directory 'files/res/data')) {
-    throw 'Baseline app-private files/res/data is unavailable through run-as.'
+Assert-RunAs -PackageName $LegacyBaselinePackage
+if (-not (Test-PrivateDirectory -PackageName $LegacyBaselinePackage -Directory 'files/res/data')) {
+    throw 'Historical baseline app-private files/res/data is unavailable through run-as.'
 }
-if (-not (Test-PrivateDirectory -PackageName $BaselinePackage -Directory 'files/res/sound')) {
-    throw 'Baseline app-private files/res/sound is unavailable through run-as.'
+if (-not (Test-PrivateDirectory -PackageName $LegacyBaselinePackage -Directory 'files/res/sound')) {
+    throw 'Historical baseline app-private files/res/sound is unavailable through run-as.'
 }
 
 $TarHelp = (& $Adb shell /system/bin/toybox tar --help 2>&1 | Out-String)
@@ -93,58 +84,48 @@ if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($TarHelp)) {
     throw 'Android toybox tar is unavailable; refusing an unverified data-copy path.'
 }
 
-$BaselineDataFiles = @(Get-PrivateFileList -PackageName $BaselinePackage -Directory 'files/res/data')
-$BaselineSoundFiles = @(Get-PrivateFileList -PackageName $BaselinePackage -Directory 'files/res/sound')
+$BaselineDataFiles = @(Get-PrivateFileList -PackageName $LegacyBaselinePackage -Directory 'files/res/data')
+$BaselineSoundFiles = @(Get-PrivateFileList -PackageName $LegacyBaselinePackage -Directory 'files/res/sound')
 if ($BaselineDataFiles.Count -lt 1 -or $BaselineSoundFiles.Count -lt 1) {
-    throw 'Baseline game-data directories are unexpectedly empty.'
+    throw 'Historical baseline game-data directories are unexpectedly empty.'
 }
 
 & $Adb install -r $Apk
-if ($LASTEXITCODE -ne 0) {
-    throw "QA APK install failed: $LASTEXITCODE"
-}
+if ($LASTEXITCODE -ne 0) { throw "QA APK install failed: $LASTEXITCODE" }
 
 Assert-RunAs -PackageName $QaPackage
-
 & $Adb shell am force-stop $QaPackage | Out-Null
 & $Adb shell run-as $QaPackage rm -rf files/res
-if ($LASTEXITCODE -ne 0) {
-    throw 'Unable to clear QA app-private res directory.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'Unable to clear QA app-private res directory.' }
 & $Adb shell run-as $QaPackage mkdir -p files
-if ($LASTEXITCODE -ne 0) {
-    throw 'Unable to prepare QA app-private files directory.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'Unable to prepare QA app-private files directory.' }
 
-$CopyCommand = "run-as $BaselinePackage /system/bin/toybox tar -C files -cf - res | run-as $QaPackage /system/bin/toybox tar -C files -xf -"
+$CopyCommand = "run-as $LegacyBaselinePackage /system/bin/toybox tar -C files -cf - res | run-as $QaPackage /system/bin/toybox tar -C files -xf -"
 $CopyOutput = @(& $Adb shell $CopyCommand 2>&1 | ForEach-Object { $_.ToString() })
 if ($LASTEXITCODE -ne 0) {
-    throw "On-device baseline-to-QA game-data copy failed. Output: $($CopyOutput -join '; ')"
+    throw "On-device historical-baseline-to-QA game-data copy failed. Output: $($CopyOutput -join '; ')"
 }
 
 $QaDataFiles = @(Get-PrivateFileList -PackageName $QaPackage -Directory 'files/res/data')
 $QaSoundFiles = @(Get-PrivateFileList -PackageName $QaPackage -Directory 'files/res/sound')
-
 $DataDiff = @(Compare-Object -ReferenceObject $BaselineDataFiles -DifferenceObject $QaDataFiles)
 $SoundDiff = @(Compare-Object -ReferenceObject $BaselineSoundFiles -DifferenceObject $QaSoundFiles)
 if ($DataDiff.Count -gt 0 -or $SoundDiff.Count -gt 0) {
     throw "QA game-data file-list mismatch. data differences=$($DataDiff.Count), sound differences=$($SoundDiff.Count)"
 }
 
-$BaselinePathAfter = @(Get-PackagePath -PackageName $BaselinePackage)
+$BaselinePathAfter = @(Get-PackagePath -PackageName $LegacyBaselinePackage)
 if (($BaselinePathBefore -join "`n") -ne ($BaselinePathAfter -join "`n")) {
-    throw 'Baseline package path changed during QA deployment.'
+    throw 'Historical baseline package path changed during QA deployment.'
 }
 
 & $Adb shell am start -n "$QaPackage/com.rp5np.systemshock.ShockolateActivity"
-if ($LASTEXITCODE -ne 0) {
-    throw 'QA application launch failed.'
-}
+if ($LASTEXITCODE -ne 0) { throw 'QA application launch failed.' }
 
 Write-Host 'INSTALL_QA_FROM_BASELINE=PASS'
 Write-Host "QA_PACKAGE=$QaPackage"
-Write-Host "BASELINE_PACKAGE=$BaselinePackage"
+Write-Host "LEGACY_BASELINE_PACKAGE=$LegacyBaselinePackage"
 Write-Host "DATA_FILES=$($QaDataFiles.Count)"
 Write-Host "SOUND_FILES=$($QaSoundFiles.Count)"
 Write-Host 'FILE_LIST_MATCH=PASS'
-Write-Host 'BASELINE_PRESERVED=PASS'
+Write-Host 'LEGACY_BASELINE_PRESERVED=PASS'
