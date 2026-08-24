@@ -8,19 +8,21 @@ This project separates **source identity** from **release-artifact identity**. A
 
 For the stable v1 line, the authoritative source identity is the exact Git commit referenced by the release tag.
 
-A published `v1.0.0` release is valid only when:
+Published `v1.0.0` is identified by:
 
-1. tag `v1.0.0` resolves to the accepted source commit;
-2. the signed APK was built from that exact commit through the documented release gate;
-3. the release manifest records the same commit;
-4. the APK SHA-256 is published alongside the APK;
-5. the APK signing certificate is the dedicated stable signing identity created for the stable package.
+- tag: `v1.0.0`;
+- source commit: `d40e02b00e5e59b956b18fdd2a13a41672090b2c`;
+- package: `io.github.raposomiguel50.systemshock`;
+- APK SHA-256: `a6dcb7f76374dd7d4f7e39f0ecc08446f2956a33bda7655d699d5ba639b8526f`;
+- signing certificate SHA-256: `806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b`.
 
-Git history provides integrity and provenance for the source files. GitHub-generated source archives for a tag are tied to that tagged commit rather than to a separately maintained per-file checksum inventory.
+The release manifest, `.sha256` file and final-gate report record the same release identity. The public APK was downloaded again after publication and reproduced the expected APK SHA-256.
+
+Git history provides integrity and provenance for source files. GitHub-generated source archives for the tag are therefore tied to the tagged commit rather than to a separately maintained per-file checksum inventory.
 
 ## Historical source checksum files
 
-Earlier public snapshots included root-level per-file checksum inventories. Those files are retained in Git history but are not the integrity authority for stable v1.
+Earlier public snapshots included root-level per-file checksum inventories. Those files remain in Git history but are not the integrity authority for stable v1.
 
 ## Stable package/signing identity
 
@@ -32,9 +34,13 @@ The historical pre-release used:
 
 `com.rp5np.systemshock`
 
-The separate package ID intentionally breaks the dependency on the historical pre-release signing key. The first official stable build creates a new dedicated private signing identity. Its certificate SHA-256 is generated before the release build, pinned into that build's verification environment, written into the release manifest/final-gate report and then preserved as the immutable signing identity for future stable updates.
+The separate package ID intentionally removes the stable line's dependency on the historical pre-release signing key and lets both applications coexist.
 
-The private key and credentials are never committed to Git.
+The dedicated stable signing identity is now established. Every compatible future stable update must preserve certificate SHA-256:
+
+`806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b`
+
+The private key and its credentials remain outside Git and public release artifacts.
 
 ## Release artifact identity
 
@@ -46,14 +52,20 @@ SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256
 SystemShock-Android-v1.0.0-release.json
 ```
 
-The JSON manifest records the source commit, package, version, ABI, application label, APK SHA-256, signing-certificate SHA-256 and the fact that proprietary game data is not included.
+`scripts/v1-final-gate.ps1` additionally produces:
 
-`scripts/verify-apk.ps1` requires `RP5NP_RELEASE_CERT_SHA256` for release/release-QA variants and fails if the built APK does not match that explicitly pinned stable identity.
+```text
+SystemShock-Android-v1.0.0-final-gate.txt
+```
+
+The JSON manifest records source commit, package, version, ABI, application label, APK SHA-256, signing-certificate SHA-256 and `proprietaryGameDataIncluded=false`.
+
+`scripts/verify-apk.ps1` requires `RP5NP_RELEASE_CERT_SHA256` for release/release-QA variants and rejects APKs that do not match the explicitly pinned stable identity.
 
 ## Commercial-data boundary
 
-The APK verifier checks for obvious embedded System Shock commercial-resource paths/files. This is a release guard, not a grant of rights to any game data. Users supply compatible game data separately from a lawful copy.
+The APK verifier checks for obvious embedded System Shock commercial-resource paths/files. This is a release guard, not a grant of rights to game data. Users supply compatible data separately from a lawful copy.
 
 ## Reproducibility boundary
 
-The reproducibility claim applies to the documented public source, pinned dependencies and toolchain. The private stable signing key is deliberately not reproducible or public; it is an identity credential used only to produce official compatible stable updates.
+The reproducibility claim applies to documented public source, pinned dependencies, toolchain and build behavior. The private stable signing key is deliberately not reproducible or public; it is an identity credential used only to produce official compatible stable updates.
