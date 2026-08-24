@@ -22,13 +22,22 @@ if ([string]::IsNullOrWhiteSpace($ExpectedSigner)) {
 }
 $ExpectedSigner = ($ExpectedSigner -replace '[^0-9a-fA-F]','').ToLowerInvariant()
 
-$Head = (& $Git -C $Root rev-parse HEAD).Trim()
-if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($Head)) {
+$HeadOutput = @(& $Git -C $Root rev-parse HEAD)
+if ($LASTEXITCODE -ne 0 -or $HeadOutput.Count -lt 1) {
     throw 'Unable to determine source commit.'
 }
-$Branch = (& $Git -C $Root branch --show-current).Trim()
+$Head = ($HeadOutput -join '').Trim()
+if ([string]::IsNullOrWhiteSpace($Head)) {
+    throw 'Unable to determine source commit.'
+}
+
+$BranchOutput = @(& $Git -C $Root branch --show-current)
 if ($LASTEXITCODE -ne 0) {
     throw 'Unable to determine current branch.'
+}
+$Branch = ($BranchOutput -join '').Trim()
+if ([string]::IsNullOrWhiteSpace($Branch)) {
+    $Branch = 'DETACHED'
 }
 
 & $Git -C $Root diff --quiet --exit-code
