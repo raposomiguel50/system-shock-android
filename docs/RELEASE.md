@@ -56,14 +56,27 @@ The exact Git commit referenced by the release tag is the authoritative source i
 
 The v1 release manifest must record the exact source commit used to produce the signed APK. See [`INTEGRITY.md`](INTEGRITY.md).
 
-## Release gate
+## Normal v1 final gate
 
-From a clean checkout of the accepted source commit:
+For the v1 stable candidate, the preferred command from a clean checkout is:
 
 ```powershell
-pwsh -File .\scripts\bootstrap-deps.ps1
+pwsh -File .\scripts\v1-final-gate.ps1
+```
+
+This wrapper runs the existing QA path and signed release path, then verifies that the generated APK, `.sha256` file and JSON release manifest agree on the exact source commit and stable v1 identity. It writes:
+
+```text
+dist/SystemShock-Android-v1.0.0-final-gate.txt
+```
+
+The lower-level release command remains available when needed:
+
+```powershell
 pwsh -File .\scripts\release-gate.ps1
 ```
+
+## Release gate internals
 
 `release-gate.ps1` performs:
 
@@ -82,6 +95,7 @@ Expected v1.0.0 outputs:
 dist/SystemShock-Android-v1.0.0-arm64-v8a.apk
 dist/SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256
 dist/SystemShock-Android-v1.0.0-release.json
+dist/SystemShock-Android-v1.0.0-final-gate.txt
 ```
 
 ## v1.0 manual acceptance already established
@@ -95,13 +109,13 @@ That manual product gate does not replace the final machine gates below. It mean
 A stable APK is publishable only after all of these are true:
 
 1. GitHub Actions QA passes from the exact final v1.0.0 public source tree.
-2. A fresh local checkout passes dependency bootstrap, QA build and APK verification.
+2. `scripts/v1-final-gate.ps1` passes from a clean local checkout with the established private release key.
 3. The accepted source commit is fixed and recorded.
 4. The signed release build is generated from that exact commit with the established release key.
 5. `verify-apk.ps1 -Variant release` passes.
 6. The APK reports package `com.rp5np.systemshock`, `versionCode 10000`, `versionName 1.0.0`, label `System Shock - Android`, ABI `arm64-v8a`, and non-debuggable release state.
 7. The release certificate SHA-256 matches the established stable digest.
-8. The release APK SHA-256 and JSON release manifest are retained as evidence.
+8. The release APK SHA-256, JSON release manifest and final-gate report are retained as evidence.
 9. Git tag `v1.0.0` points to the exact accepted source commit.
 10. The GitHub release uses that tag and publishes the verified signed APK plus its SHA-256 file.
 11. Public README/site/ModDB status is changed from pre-release/candidate to stable only after the signed artifact exists.

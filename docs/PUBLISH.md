@@ -6,12 +6,17 @@ The dedicated public repository already exists at `raposomiguel50/system-shock-a
 
 Before publishing `v1.0.0`:
 
-1. Freeze the accepted public source commit on `main`.
+1. Freeze the accepted public source commit on `main` and the release-candidate branch.
 2. Confirm the v1 preservation scope in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md).
 3. Complete the machine gates in [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
-4. Build the signed release from a clean checkout of the exact accepted commit.
-5. Retain the APK SHA-256, release JSON manifest and stable signing-certificate digest.
-6. Create tag `v1.0.0` on that exact commit.
+4. From a clean checkout with the established private release-signing environment configured, run:
+
+```powershell
+pwsh -File .\scripts\v1-final-gate.ps1
+```
+
+5. Retain the APK SHA-256, release JSON manifest and final-gate report.
+6. Create tag `v1.0.0` on the exact commit reported by the successful final gate.
 7. Publish the signed APK and its `.sha256` file through the GitHub release associated with that tag.
 8. Copy the final source commit and APK SHA-256 into the release notes.
 9. Only after the verified artifact is public, update the README, project website and ModDB from release-candidate/pre-release wording to stable `v1.0.0`.
@@ -20,15 +25,16 @@ See [`INTEGRITY.md`](INTEGRITY.md) for the source/release identity model.
 
 ## Required public artifacts
 
-The release gate produces:
+The final gate produces:
 
 ```text
 dist/SystemShock-Android-v1.0.0-arm64-v8a.apk
 dist/SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256
 dist/SystemShock-Android-v1.0.0-release.json
+dist/SystemShock-Android-v1.0.0-final-gate.txt
 ```
 
-The APK and `.sha256` file should be attached to the GitHub release. The JSON manifest should be retained as release evidence and may also be published when useful for verification.
+The APK and `.sha256` file should be attached to the GitHub release. The JSON manifest and final-gate report should be retained as release evidence and may also be published when useful for verification.
 
 ## Commercial-data boundary
 

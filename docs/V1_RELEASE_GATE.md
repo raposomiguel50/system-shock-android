@@ -20,16 +20,33 @@ See [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md) and [`INTEGRITY.md`](INTEGR
 - [x] HD, widescreen/Hor+, font-remaster and gameplay-change work declared out of scope for the stable preservation release.
 - [x] Stale per-file checksum inventories retired from the current branch; exact Git commit + release manifest + APK SHA-256 + stable signing certificate define v1 integrity.
 
+## Final local machine gate
+
+Run the final candidate from a **clean checkout** with the established private release-signing environment configured:
+
+```powershell
+pwsh -File .\scripts\v1-final-gate.ps1
+```
+
+The wrapper runs the QA gate, produces the signed release through `release-gate.ps1`, verifies the stable APK identity and signing certificate, cross-checks the release manifest and `.sha256` file, and writes a final report into `dist/` without printing signing credentials.
+
+Expected additional report:
+
+```text
+dist/SystemShock-Android-v1.0.0-final-gate.txt
+```
+
 ## Machine/release gates
 
-The following must be completed against the exact v1.0.0 source commit before the GitHub release is published:
+The following must be completed against the exact final v1.0.0 source commit before the GitHub release is published:
 
 - [ ] GitHub Actions QA build and semantic APK verification pass after the final v1.0.0 source changes.
+- [ ] `scripts/v1-final-gate.ps1` reports `V1_FINAL_LOCAL_GATE=PASS` from a clean checkout.
 - [ ] Fresh local checkout resolves the pinned public dependencies.
 - [ ] Signed `release` build is produced with the established stable key.
 - [ ] `scripts/verify-apk.ps1 -Variant release` passes.
 - [ ] Release certificate SHA-256 equals `7419c3aae7efaeea3e0e10945a98164418faf92fa1e55deac2b654c72cb34409`.
-- [ ] APK SHA-256 and release manifest are recorded.
+- [ ] APK SHA-256 and release manifest are recorded and agree with the final-gate report.
 - [ ] Git tag `v1.0.0` points to the exact accepted source commit.
 - [ ] GitHub release contains the signed APK and its SHA-256 file.
 - [ ] Public README, project website and ModDB are updated from pre-release/candidate to stable only after the signed artifact is published.
