@@ -4,11 +4,9 @@
 
 The stable release path is separate from normal development and QA. A public APK must not be produced from an arbitrary dirty workspace or the generic Android debug signing key.
 
-Stable v1.0 is a preservation release. Its product boundary is defined in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md), its integrity model in [`INTEGRITY.md`](INTEGRITY.md), and its final checklist in [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
+Stable v1.0 is a preservation release. Its product boundary is defined in [`PRESERVATION_SCOPE.md`](PRESERVATION_SCOPE.md), its integrity model in [`INTEGRITY.md`](INTEGRITY.md), and its completed final checklist in [`V1_RELEASE_GATE.md`](V1_RELEASE_GATE.md).
 
 ## Stable application identity
-
-Stable v1.0 starts a clean Android application/signing line:
 
 - stable package: `io.github.raposomiguel50.systemshock`;
 - historical pre-release package: `com.rp5np.systemshock`;
@@ -17,7 +15,7 @@ Stable v1.0 starts a clean Android application/signing line:
 - application label: `System Shock - Android`;
 - ABI: `arm64-v8a`.
 
-Because the package IDs differ, the stable v1 APK can coexist with the historical pre-release. Stable v1 does not depend on recovering the pre-release keystore.
+Because package IDs differ, stable v1 can coexist with the historical pre-release and does not depend on recovering the old pre-release keystore.
 
 The Java/Android source namespace remains `com.rp5np.systemshock` internally; `applicationId` is the public install identity.
 
@@ -28,13 +26,15 @@ The Java/Android source namespace remains `com.rp5np.systemshock` internally; `a
 - `releaseQa`: `io.github.raposomiguel50.systemshock.releaseqa`, stable release key;
 - `release`: `io.github.raposomiguel50.systemshock`, non-debuggable, stable release key.
 
-## Stable signing boundary
+## Established stable signing identity
 
-The first v1.0 release creates a new dedicated signing identity for the stable package. The key and its credentials remain outside Git.
+The dedicated stable signing identity was created during the v1.0.0 final release process and is now fixed for compatible future stable updates.
 
-The official one-click release runner creates the key automatically when it does not yet exist, generates a strong random password, stores the key in the project's private local signing area, and protects the generated credentials for the current Windows user. Later stable releases reuse that same identity automatically.
+Signing certificate SHA-256:
 
-The build scripts receive the signing material through:
+`806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b`
+
+The private key and its credentials remain outside Git. Build scripts receive signing material through:
 
 - `RP5NP_RELEASE_STORE_FILE`
 - `RP5NP_RELEASE_STORE_PASSWORD`
@@ -42,43 +42,43 @@ The build scripts receive the signing material through:
 - `RP5NP_RELEASE_KEY_PASSWORD`
 - `RP5NP_RELEASE_CERT_SHA256`
 
-`RP5NP_RELEASE_CERT_SHA256` is mandatory for release/release-QA verification. The first stable release records the generated certificate digest in the release manifest and release evidence. Every future stable release must reuse that certificate.
+`RP5NP_RELEASE_CERT_SHA256` is mandatory for release/release-QA verification. Future official stable releases must reuse the established certificate above.
 
-## Source identity
+## Published v1.0.0 evidence
 
-The exact Git commit referenced by the release tag is the authoritative source identity. The release manifest records that same commit.
+- Release tag: `v1.0.0`
+- Release source commit: `d40e02b00e5e59b956b18fdd2a13a41672090b2c`
+- Package: `io.github.raposomiguel50.systemshock`
+- APK SHA-256: `a6dcb7f76374dd7d4f7e39f0ecc08446f2956a33bda7655d699d5ba639b8526f`
+- Signing certificate SHA-256: `806d9cb061de67aa6953cdac573bd917da6aa17625964c2898d23e226bd5323b`
+- Proprietary game data included: `false`
 
-## Final release gate
+The public GitHub release contains:
 
-The normal low-level final gate is:
+```text
+SystemShock-Android-v1.0.0-arm64-v8a.apk
+SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256
+SystemShock-Android-v1.0.0-release.json
+SystemShock-Android-v1.0.0-final-gate.txt
+```
+
+The published APK was downloaded again after release and its SHA-256 matched the accepted release hash.
+
+## Low-level release gates
+
+The signed release path remains available for later maintenance releases:
+
+```powershell
+pwsh -File .\scripts\release-gate.ps1
+```
+
+The v1-style full gate is:
 
 ```powershell
 pwsh -File .\scripts\v1-final-gate.ps1
 ```
 
-For the official stable build, use the project one-click runner supplied with the release workflow. It prepares or reuses the private stable signing identity, sets the required signing environment, clones the accepted source commit, executes the final gate and produces a feedback bundle without exposing credentials.
-
-Expected outputs:
-
-```text
-dist/SystemShock-Android-v1.0.0-arm64-v8a.apk
-dist/SystemShock-Android-v1.0.0-arm64-v8a.apk.sha256
-dist/SystemShock-Android-v1.0.0-release.json
-dist/SystemShock-Android-v1.0.0-final-gate.txt
-```
-
-## Required machine gates before publishing v1.0.0
-
-1. GitHub Actions QA passes from the exact final v1.0.0 public source tree.
-2. The one-click final runner creates or reuses the stable private signing identity and `scripts/v1-final-gate.ps1` passes from a clean checkout.
-3. The accepted source commit is fixed and recorded.
-4. `verify-apk.ps1 -Variant release` passes.
-5. The APK reports package `io.github.raposomiguel50.systemshock`, `versionCode 10000`, `versionName 1.0.0`, label `System Shock - Android`, ABI `arm64-v8a`, and non-debuggable release state.
-6. The generated stable signing-certificate SHA-256 is recorded and preserved for future stable upgrades.
-7. The release APK SHA-256, JSON release manifest and final-gate report are retained as evidence.
-8. Git tag `v1.0.0` points to the exact accepted source commit.
-9. The GitHub release publishes the verified signed APK plus its SHA-256 file.
-10. Public README/site/ModDB status changes to stable only after the signed artifact exists.
+The gate checks static PowerShell validation, release preflight, build, APK semantics, package/version/ABI, non-debuggable state, stable signing certificate, artifact hashes and release-manifest consistency.
 
 ## Data boundary
 
