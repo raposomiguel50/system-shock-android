@@ -9,7 +9,7 @@ This file records independent public coverage of the System Shock - Android proj
 **Started:** 26 August 2026  
 **Coverage type:** Independent community discussion
 
-RetroGameTalk member Electric Gigolo opened a community discussion about the Android port, linked directly to the project's GitHub repository and identified the Retroid Pocket 5 as the tested reference device. The thread also embedded Mr. Sujano's video coverage of the project.
+RetroGameTalk member Electric Gigolo opened a community discussion about the Android port, linked directly to the project's GitHub repository, and noted that the port had been tested on a Retroid Pocket 5. The thread also embedded Mr. Sujano's video coverage of the project.
 
 The first community reply was positive about making the original game accessible to newer generations. This entry records organic community discovery of the project; it is not treated as editorial press coverage or technical validation.
 
@@ -21,7 +21,7 @@ The first community reply was positive about making the original game accessible
 **Project segment:** [10:40 — System Shock Android](https://www.youtube.com/watch?v=cLREnxvoD90&t=640s)  
 **Coverage type:** Independent video/news coverage
 
-Mr. Sujano included System Shock - Android as a dedicated chapter in his gaming, technology, open-source and emulation news video. The segment points viewers to the project as a distinct news item rather than an incidental mention.
+Mr. Sujano included System Shock - Android as a dedicated chapter in his gaming, technology, open-source and emulation news video. The segment presents the project as a distinct news item rather than an incidental mention.
 
 The video also produced direct audience reaction to the Android port in its comments. View counts, subscriber counts and other mutable platform metrics are intentionally not recorded here as project metadata.
 
@@ -30,7 +30,7 @@ The video also produced direct audience reaction to the Android port in its comm
 **Publication:** GenerationAmiga.com  
 **Article:** [System Shock Android port brings the 1994 classic to handhelds](https://www.generationamiga.com/2026/08/21/system-shock-android-port-brings-the-1994-classic-to-handhelds/)  
 **Published:** 21 August 2026  
-**Coverage type:** Independent external article
+**Coverage type:** Independent editorial article
 
 GenerationAmiga covered the first APK-bearing public pre-release of the project. The article describes the port as a native Android/ARM64 build based on Shockolate, with the Retroid Pocket 5 as the main reference device rather than a DOS-emulation setup.
 
